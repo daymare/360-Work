@@ -224,7 +224,7 @@ int enqueue(Node **queue, Node *p)
 	Node* next = current->next;
 	while (next != NULL)
 	{
-		if (p->priority > p->priority)
+		if (p->priority > next->priority)
 		{
 			current->next = p;
 			p->next = next;
@@ -264,7 +264,17 @@ void printMainArgs(int argc, char* argv[], char* env[])
 
 	myprintf("\n\n");
 
-	myprintf("%s", env);
+	i = 0;
+	currentString = env[i];
+
+	while (currentString != NULL)
+	{
+		myprintf("%s,   ", currentString);
+		i++;
+		currentString = env[i];
+	}
+
+	myprintf("\n\n");
 }
 
 Node * mallocNode()
