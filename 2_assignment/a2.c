@@ -1,5 +1,8 @@
 
 #include <stdio.h>
+#include <stdlib.h>
+
+#include <string.h>
 
 
 // print char (given as putc)
@@ -147,26 +150,8 @@ void myprintf(char *format, ...)
 	}
 }
 
-
-///////////////////////////////////////// problem 3
-
-
-typedef struct node
-{
-	struct node *next;
-	char name[64];
-	int priority;
-}Node;
-
-Node *readyQueue = NULL;
-
-int enqueue(Node **
-
-
-
-
-
-int main(int argc, char* argv, char* env)
+// test all of the print functions
+void testPrints()
 {
 	// test print uint
 	printUInt(891784);
@@ -198,9 +183,147 @@ int main(int argc, char* argv, char* env)
 	// test printf basic
 	myprintf("testing! %d %d \n", 12345, 12);
 
-	// test printf EVERYTHING
+	// test printf everything
 	myprintf("more testing! %c, %s, %u, %d, %o, %x\n", 'c', "test string!", 123456, -1234, 842799, 842799);
+}
 
+
+///////////////////////////////////////// problem 3
+
+
+typedef struct node
+{
+	struct node *next;
+	char name[64];
+	int priority;
+}Node;
+
+Node *readyQueue = NULL;
+
+// enqueue a node in priority then FIFO order
+int enqueue(Node **queue, Node *p)
+{
+	// case for empty list
+	if (*queue == NULL)
+	{
+		*queue = p;
+		p->next = NULL;
+		return 0;
+	}
+
+	// case for first element in list
+	if (p->priority > (*queue)->priority)
+	{
+		p->next = *queue;
+		*queue = p;
+		return 0;
+	}
+
+	// insert in nonempty list
+	Node* current = *queue;
+	Node* next = current->next;
+	while (next != NULL)
+	{
+		if (p->priority > p->priority)
+		{
+			current->next = p;
+			p->next = next;
+			return 0;
+		}
+		current = next;
+		next = next->next;
+	}
+
+	// reached end of list, just insert at end
+	p->next = NULL;
+	current->next = p;
+}
+
+
+// dequeue a node from the priority queue.
+Node *dequeue(Node **queue)
+{
+	// take out the first node in the list.
+	Node *result = *queue;
+	*queue = result->next;
+	result->next = NULL;
+
+	return result;
+}
+
+void printMainArgs(int argc, char* argv[], char* env[])
+{
+	// print argv strings
+	char *currentString = NULL;
+	int i = 0;
+	for (i = 0; i < argc; i++)
+	{
+		currentString = argv[i];
+		myprintf("%s,   ", currentString);
+	}
+
+	myprintf("\n\n");
+
+	myprintf("%s", env);
+}
+
+Node * mallocNode()
+{
+	Node * newNode = (Node*)malloc(sizeof(Node));
+	newNode->next = NULL;
+	newNode->priority = 0;
+	return newNode;
+}
+
+void fillNode(Node * node, int i)
+{
+	sprintf(node->name, "node%d", i);
+	node->priority = rand() % 10;
+}
+
+
+void printNode(Node * node)
+{
+	myprintf("%s, p: %d -->", node->name, node->priority);
+}
+
+void printQueue(Node * head)
+{
+	while(head != NULL)
+	{
+		printNode(head);
+		head = head->next;
+	}
+
+	putchar('\n');
+}
+
+
+
+int main(int argc, char* argv[], char* env[])
+{
+	testPrints();
+
+	printMainArgs(argc, argv, env);
+
+	// infinite enqueue loop
+	int i = 0;
+	Node *currentNode = NULL;
+	Node *queue = NULL;
+	while(1)
+	{
+		// add a new node to queue and print
+		currentNode = mallocNode();
+		fillNode(currentNode, i);
+		enqueue(&queue, currentNode);
+		printQueue(queue);
+
+		i++;
+		
+		// wait for the user to press any key
+		fflush(stdin);
+		getchar();
+	}
 }
 
 
