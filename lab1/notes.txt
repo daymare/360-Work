@@ -1,0 +1,12 @@
+
+
+potential additional features:
+	.. and . as files
+	command prompt outputs the path you are at.
+	colors
+	mv
+
+
+
+
+
