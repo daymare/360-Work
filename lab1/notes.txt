@@ -1,12 +1,21 @@
 
 
 potential additional features:
-	.. and . as files
-	command prompt outputs the path you are at.
 	colors
 	mv
+	command line options like flags
+	piping
+	tab completion
+	custom user commands
+	Ignore . files when printing out with ls
+	man page support
+
+Stuff TODO
+	not have segmentation fault when the user tries to input a command that does not exist
+	command prompt outputs the path you are at.
 
 
-
+Stuff Done
+	.. and . as files
 
 

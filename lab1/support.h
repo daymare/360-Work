@@ -30,6 +30,7 @@ typedef struct file
 
 typedef enum pathtype
 {
+	EmptyPath,
 	RelativePath,
 	AbsolutePath
 } PathType;
@@ -42,6 +43,33 @@ typedef struct filepath
 	char pathName[32][64]; // names of directory files leading to the end file
 	PathType pathType;
 } Filepath;
+
+
+char typeToChar(Filetype type)
+{
+	switch(type)
+	{
+		case Filetype_Directory:
+			return 'D';
+			break;
+		case Filetype_File:
+			return 'F';
+			break;
+	}
+}
+
+Filetype charToType(char c)
+{
+	switch (c)
+	{
+		case 'D':
+			return Filetype_Directory;
+			break;
+		case 'F':
+			return Filetype_File;
+			break;
+	}
+}
 
 //////////////////////////////////////////// supporting functions for commands
 File * allocateFile()
@@ -155,7 +183,10 @@ int removeFile(File* file)
 Filepath processFilepath(char * rawPath)
 {
 	char * s;
+	char currentPath[128];
 	Filepath filepath;
+	memset(&filepath, 0, sizeof(Filepath));
+	filepath.pathType = EmptyPath;
 
 	// case for empty filepath
 	if (strlen(rawPath) == 0) return filepath;
@@ -165,22 +196,23 @@ Filepath processFilepath(char * rawPath)
 	if (*rawPath == '/')
 	{
 		filepath.pathType = AbsolutePath;
-		rawPath++;
+		strcpy(currentPath, rawPath+1);
 	} else
 	{
 		filepath.pathType = RelativePath;
+		strcpy(currentPath, rawPath);
 	}
 
 
 	// check if there is only one token in the path
-	if (strstr(rawPath, "/") == NULL)
+	if (strstr(currentPath, "/") == NULL)
 	{
-		strcpy(filepath.baseName, rawPath);
+		strcpy(filepath.baseName, currentPath);
 		return filepath;
 	}
 
 	int i = 0;
-	s = strtok(rawPath, "/"); // TODO strtok does not like how I am breaking up rawPath... fix the absolute problem some other way.
+	s = strtok(currentPath, "/"); 
 	strcpy(filepath.pathName[i], s);
 	i++;
 
@@ -216,6 +248,18 @@ File* findFile(char* filename, File* parentDir, Filetype fileType)
 {
 	File* result = NULL;
 	File* currentSibling = parentDir->child;
+
+	// check for . and .. special cases
+	if (strcmp(filename, "..") == 0 && fileType == Filetype_Directory)
+	{
+		return parentDir->parent;
+	}
+
+	if (strcmp(filename, ".") == 0 && fileType == Filetype_Directory)
+	{
+		return parentDir;
+	}
+
 
 	// traverse through the children of the parent to find the desired file
 	while (currentSibling != NULL)
@@ -259,12 +303,12 @@ File* findPathDir(Filepath* path)
 	while (strcmp(currentName, "") != 0)
 	{
 		// case for ..
-		if (strcmp(currentName, ".."))
+		if (strcmp(currentName, "..") == 0)
 		{
 			// move up to parent directory
 			currentFile = currentFile->parent;
 		}
-		else if (strcmp(currentName, "."))
+		else if (strcmp(currentName, ".") == 0)
 		{
 			// case for .
 			// do nothing.
@@ -282,7 +326,7 @@ File* findPathDir(Filepath* path)
 		}
 
 		i++;
-		currentName = path->pathName[i];
+	currentName = path->pathName[i];
 	}
 
 	return currentFile;

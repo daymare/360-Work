@@ -12,7 +12,7 @@
 // testing
 void runTests()
 {
-	printf("running tests!\n");
+	printf("running tests!\n\n");
 
 	// install dummy filesystem
 	installDummyFilesystem();
@@ -28,7 +28,7 @@ void runTests()
 	// remove dummy filesystem
 	removeDummyFilesystem();
 
-	printf("all tests complete!\n");
+	printf("\nall tests complete!\n");
 }
 
 

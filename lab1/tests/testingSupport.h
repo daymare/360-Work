@@ -15,6 +15,7 @@ File* makeDummyFilesystem()
 	makeFile(fs, "a_dir", Filetype_Directory);
 	makeFile(fs, "b_file", Filetype_File);
 	makeFile(fs->child, "c_dir", Filetype_Directory);
+	makeFile(fs->child->child, "e_dir", Filetype_Directory);
 	makeFile(fs->child->child, "d_file", Filetype_File);
 
 	return fs;
