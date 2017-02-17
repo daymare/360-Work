@@ -1,0 +1,23 @@
+List of features to implement in priority order.
+
+
+Assignment stuff:
+    Handle simple commands
+        Trivial commands
+        Running other executables
+    IO redirection
+    Piping
+
+Extra stuff:
+    Files
+    Wildcards
+    Tab completion
+    Better handling of ^C and ^D
+    Lists
+    Control Structures
+    Functions
+    Variables
+
+
+
+

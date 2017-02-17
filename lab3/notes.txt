@@ -1,0 +1,55 @@
+
+
+
+Program simulating bash.
+
+Starting out going to just reuse bash commands
+
+Bash is an interpreter and does not care whether commands are entered to stdin or from a file.
+
+We are building an interpreter.
+
+Feature list:
+    Must act like bash for the most part.
+        IE must run an interpreter like bash
+        Must implement wildcards/REGEX
+    Must have something else that is ridiculous and experimental and fun.
+
+Bash Feature list: (remember bash is a programming language)
+    piping
+    lists
+    control structures
+    functions
+    variables
+
+    Expansion
+    Redirection
+    Scripting
+    Running commands
+    Interactive History
+
+Built in commands:
+    cd
+    eval
+    exec
+    exit
+    pwd
+    return
+    echo
+
+Bash Execution order:
+    // read input line from a file (either the terminal or a file)
+    // tokenize input
+    // parse tokens into commands (simple or compound)
+    // perform shell expansions
+    // perform any redirections
+    // executes THE command (only one command?)
+    // optionally wait for the command to complete and collect exit status
+
+
+
+Notes:
+    Bash is recursive, commands are run in subshells that are linked to the main shell.
+    I do not care about effeciency, I care about power. Effeciency comes later.
+
+
