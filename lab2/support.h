@@ -38,7 +38,6 @@ typedef enum pathtype
 
 typedef struct filepath
 {
-
 	char baseName[64]; // name of file itself 
 	char pathName[32][64]; // names of directory files leading to the end file
 	PathType pathType;
