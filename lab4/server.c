@@ -41,10 +41,7 @@ int server_init(char *name)
    }
 
    struct in_addr **addr_list;
-
    addr_list = (struct in_addr **)hp->h_addr_list;
-
-
    printf("    hostname=%s  IP=%s\n", hp->h_name,  inet_ntoa(*addr_list[0]));
   
    //  create a TCP socket by socket() syscall
