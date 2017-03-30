@@ -236,14 +236,14 @@ int findInodePath(INODE* startingNode, char* relativeFilepath, INODE* result)
     int i = 0;
     INODE currentNode = *startingNode;
     INODE nextNode;
-    int result = 0;
+    int findResult = 0;
 
     for (i = 0; strcmp(path.tokenizedPath[i], "") != 0; i++)
     {
         char* dirname = path.tokenizedPath[i];
-        result = findFileInode(&currentNode, dirname, type_Directory, &nextNode);
+        findResult = findFileInode(&currentNode, dirname, type_Directory, &nextNode);
 
-        if (result == 0)
+        if (findResult == 0)
         {
             printf("file not found!");
             return 0;
@@ -277,12 +277,18 @@ void printInode(INODE* inode)
     // print non-indirect blocks
     for (i = 0; i < 12; i++)
     {
+        if (inode->i_block[i] == 0) return;
+
         printIndirectBlock(inode->i_block[i], 0);
     }
 
     // print indirect blocks
+
+    if (inode->i_block[12] == 0) return;
     printIndirectBlock(inode->i_block[12], 1);
+    if (inode->i_block[13] == 0) return;
     printIndirectBlock(inode->i_block[13], 2);
+    if (inode->i_block[14] == 0) return;
     printIndirectBlock(inode->i_block[14], 3);
 }
 
