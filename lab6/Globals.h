@@ -5,6 +5,8 @@
 
 #define BLKSIZE 1024
 
+#define NMINODE      100
+#define NPROC          4
 
 // pointers
 GD    *gp;
@@ -16,9 +18,14 @@ DIR   *dp;
 char superBuf[BLKSIZE];
 char gdBuf[BLKSIZE];
 
-
+// standard buffer 
 char buf[BLKSIZE];
+
+// file descriptors
 int fd;
+int dev;
+
+
 
 
 #endif

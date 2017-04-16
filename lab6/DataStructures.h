@@ -1,6 +1,8 @@
 #ifndef DATA_STRUCTURES_H
 #define DATA_STRUCTURES_H
 
+#include <ext2fs/ext2_fs.h>
+
 typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned int   u32;
@@ -34,6 +36,31 @@ typedef enum fileType
 } FileType;
 
 
+typedef struct minode{
+  INODE inode;
+  int dev, ino;
+  int refCount;
+  int dirty;
+  int mounted;
+  struct mntable *mptr;
+}MINODE;
+
+typedef struct oft{
+  int  mode;
+  int  refCount;
+  MINODE *mptr;
+  int  offset;
+}OFT;
+
+
+#define NFD           16
+typedef struct proc{
+  struct proc *next;
+  int          pid;
+  int          uid;
+  MINODE      *cwd;
+  OFT         *fd[NFD];
+}PROC;
 
 
 #endif

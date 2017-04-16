@@ -22,7 +22,13 @@ int main(int argc, char** argv, char** env)
 
     // get the desired inode.
     INODE desiredInode;
-    findInodeAbsPath(path, &desiredInode);
+    int result = 0;
+
+    result = findInodeAbsPath(path, &desiredInode);
+    if (result == 0)
+    {
+        return 1;
+    }
 
     // print out information
     printInode(&desiredInode);

@@ -197,13 +197,16 @@ int findFileInode(INODE* parent, char* filename, FileType type, INODE* result)
 int findInodeInBlock(char* blockBuf, char* filename, FileType type, INODE* result)
 {
     // search a block 
-    // TODO potential bug, dp->name is not guaranteed to be null terminated.
     char* cp = blockBuf;
     DIR *dp = (DIR*)blockBuf;
+    char name[128];
 
     while (cp < &blockBuf[BLKSIZE])
     {
-        if (strcmp(filename, dp->name) == 0)
+        memcpy(name, dp->name, dp->name_len);
+        name[dp->name_len] = '\0';
+
+        if (strcmp(filename, name) == 0)
         {
             if (dp->file_type == (int)type)
             {
