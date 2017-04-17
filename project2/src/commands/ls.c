@@ -70,7 +70,7 @@ int printDirectory(int blockNum)
                 strcpy(color, ANSI_COLOR_RESET);
                 break;
             case 2: // directory. Blue
-                strcpy(color, ANSI_COLOR_BLUE);
+                strcpy(color, ANSI_COLOR_CYAN);
                 break;
             // TODO add different color for other filetypes
             defualt:

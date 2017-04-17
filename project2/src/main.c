@@ -67,6 +67,8 @@ int main(int argc, char** argv, char** env)
         // check for quit command
         if (strcmp(commands->command.tokenizedCommand[0], "quit") == 0)
             return 0;
+        if (strcmp(commands->command.tokenizedCommand[0], "q") == 0)
+            return 0;
 
         // run commands
         runCommands(commands);

@@ -28,21 +28,25 @@ void getName(int parentInum, int inum, FileType fileType, char* nameResult)
     result = getDir(parentInum, value, Search_INum, fileType, &dirResult);
 
     // extract the name from directory structure
-
+    memcpy(nameResult, dirResult.name, dirResult.name_len);
+    nameResult[dirResult.name_len] = '\0';
 }
 
-void reverseString(char string[])
+void reverseString(char* string)
 {
     int length = strlen(string);
 
     char* left = string;
-    char* right = string[length-1];
+    char* right = string + (length-1);
 
     while (right > left)
     {
         char temp = *left;
         *left = *right;
         *right = temp;
+
+        right--;
+        left++;
     }
 }
 
@@ -56,13 +60,20 @@ int pwd(Command* command)
     int currentInumber = running->cwd->ino;
     int parentInumber = 0;
 
+    // check for root
+    if (currentInumber == 2)
+    {
+        printf("/\n");
+        return 0;
+    }
+
     char currentName[128];
 
     // get parent
     parentInumber = getParentInumber(currentInumber);
 
     // find the name of the inode in parent dir
-    getName(parentInumber, currentInumber, type_File, currentName);
+    getName(parentInumber, currentInumber, type_Directory, currentName);
 
     // add to path
     strcpy(currentPath, currentName);
@@ -71,6 +82,7 @@ int pwd(Command* command)
     currentPath++;
 
     // while parent != current
+    // actually check for root inside of the loop
     while (parentInumber != currentInumber)
     {
         // set current to parent
@@ -78,6 +90,12 @@ int pwd(Command* command)
 
         // get parent
         parentInumber = getParentInumber(currentInumber);
+
+        // check for root
+        if (currentInumber == 2)
+        {
+            break;
+        }
 
         // find the name of the inode in parent dir
         getName(parentInumber, currentInumber, type_Directory, currentName);
@@ -96,7 +114,7 @@ int pwd(Command* command)
     reverseString(path);
 
     // print out the path string
-    printf("%s", path);
+    printf("%s\n", path);
 
     // return 0
     return 0;
