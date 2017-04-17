@@ -1,18 +1,7 @@
 #include "../header/getDir.h"
 
-typedef enum searchType
-{
-    Search_Name,
-    Search_INum
-}SearchType;
 
-typedef union searchValue
-{
-    int inumber;
-    char* name;
-}SearchValue;
-
-int getDir(int parentInum, char* name, FileType fileType, DIR* dir)
+int getDir(int parentInum, SearchValue searchValue, SearchType searchType, FileType fileType, DIR* dir)
 {
     // get parent inode
     INODE parent;
@@ -32,7 +21,7 @@ int getDir(int parentInum, char* name, FileType fileType, DIR* dir)
             return 1;
         }
 
-        result = getDirInIndirectBlock(currentBlock, name, fileType, 0, dir);
+        result = getDirInIndirectBlock(currentBlock, searchValue, searchType, fileType, 0, dir);
 
         if (result == 0)
         {
@@ -40,17 +29,17 @@ int getDir(int parentInum, char* name, FileType fileType, DIR* dir)
         }
     }
 
-    result = getDirInIndirectBlock(parent.i_block[12], name, fileType, 1, dir);
+    result = getDirInIndirectBlock(parent.i_block[12], searchValue, searchType, fileType, 1, dir);
     if (result == 0) return result;
-    result = getDirInIndirectBlock(parent.i_block[13], name, fileType, 2, dir);
+    result = getDirInIndirectBlock(parent.i_block[13], searchValue, searchType, fileType, 2, dir);
     if (result == 0) return result;
-    result = getDirInIndirectBlock(parent.i_block[14], name, fileType, 3, dir);
+    result = getDirInIndirectBlock(parent.i_block[14], searchValue, searchType, fileType, 3, dir);
     if (result == 0) return result;
 
     return 1;
 }
 
-int getDirInIndirectBlock(int blockNum, char* name, FileType fileType, int numIndirections, DIR* dir)
+int getDirInIndirectBlock(int blockNum, SearchValue searchValue, SearchType searchType, FileType fileType, int numIndirections, DIR* dir)
 {
     // valid block?
     if (blockNum == 0) 
@@ -62,7 +51,7 @@ int getDirInIndirectBlock(int blockNum, char* name, FileType fileType, int numIn
     // no indirection
     if (numIndirections == 0) 
     {
-        return getDirInBlock(block, name, fileType, dir);
+        return getDirInBlock(block, searchValue, searchType, fileType, dir);
     }
 
     // one or more indirections
@@ -72,7 +61,7 @@ int getDirInIndirectBlock(int blockNum, char* name, FileType fileType, int numIn
 
     for (i = 0; i < 256l; i++)
     {
-         result = getDirInIndirectBlock(indirection[i], name, fileType, numIndirections-1, dir);
+         result = getDirInIndirectBlock(indirection[i], searchValue, searchType, fileType, numIndirections-1, dir);
 
          if (result == 0)
          {
@@ -83,7 +72,7 @@ int getDirInIndirectBlock(int blockNum, char* name, FileType fileType, int numIn
     return 1;
 }
 
-int getDirInBlock(char* blockBuf, char* filename, FileType fileType, DIR* result)
+int getDirInBlock(char* blockBuf, SearchValue searchValue, SearchType searchType, FileType fileType, DIR* result)
 {
     char* cp = blockBuf;
     DIR* dp = (DIR*)blockBuf;
@@ -93,20 +82,40 @@ int getDirInBlock(char* blockBuf, char* filename, FileType fileType, DIR* result
     {
         memcpy(name, dp->name, dp->name_len);
         name[dp->name_len] = '\0';
-
-        if (strcmp(filename, name) == 0)
+        
+        switch (searchType)
         {
-            if (dp->file_type == (int)fileType)
-            {
-                // return the found DIR
-                *result = *dp;
-                return 0;
-            }
-            else
-            {
-                printf("ERROR: file is not the desired type!\n");
-                return 1;
-            }
+            case Search_Name:
+                if (strcmp(searchValue.name, name) == 0)
+                {
+                    if (dp->file_type == (int)fileType)
+                    {
+                        // return the found DIR
+                        *result = *dp;
+                        return 0;
+                    }
+                    else
+                    {
+                        printf("ERROR: file is not the desired type!\n");
+                        return 1;
+                    }
+                }
+                break;
+            case Search_INum:
+                if (dp->inode == searchValue.inumber)
+                {
+                    if (dp->file_type == (int)fileType)
+                    {
+                        *result = *dp;
+                        return 0;
+                    }
+                    else
+                    {
+                        printf("ERROR: file is not the desired type!\n");
+                        return 1;
+                    }
+                }
+                break;
         }
 
         cp += dp->rec_len;
@@ -118,6 +127,8 @@ int getDirInBlock(char* blockBuf, char* filename, FileType fileType, DIR* result
 
 int getParentDir(int inumber, DIR* result)
 {
-    return getDir(inumber, "..", type_Directory, result);
+    SearchValue sv;
+    sv.name = "..";
+    return getDir(inumber, sv, Search_Name, type_Directory, result);
 }
 

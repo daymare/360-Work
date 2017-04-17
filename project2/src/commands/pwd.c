@@ -1,6 +1,5 @@
 #include "../../header/commands/pwd.h"
 
-
 int getParentInumber(int inumber)
 {
     int result = 0;
@@ -19,9 +18,17 @@ int getParentInumber(int inumber)
 }
 
 
-void getName(int parentInum, int inum, char* result)
+void getName(int parentInum, int inum, FileType fileType, char* nameResult)
 {
     // find the directory with the correct inumber
+    int result = 1;
+    SearchValue value;
+    value.inumber = inum;
+    DIR dirResult;
+    result = getDir(parentInum, value, Search_INum, fileType, &dirResult);
+
+    // extract the name from directory structure
+
 }
 
 void reverseString(char string[])
@@ -51,14 +58,29 @@ int pwd(Command* command)
 
     char currentName[128];
 
+    // get parent
+    parentInumber = getParentInumber(currentInumber);
+
+    // find the name of the inode in parent dir
+    getName(parentInumber, currentInumber, type_File, currentName);
+
+    // add to path
+    strcpy(currentPath, currentName);
+    currentPath += strlen(currentName);
+    *currentPath = '/';
+    currentPath++;
+
     // while parent != current
     while (parentInumber != currentInumber)
     {
+        // set current to parent
+        currentInumber = parentInumber;
+
         // get parent
         parentInumber = getParentInumber(currentInumber);
 
         // find the name of the inode in parent dir
-        getName(parentInumber, currentInumber, currentName);
+        getName(parentInumber, currentInumber, type_Directory, currentName);
 
         // add to path
         strcpy(currentPath, currentName);
