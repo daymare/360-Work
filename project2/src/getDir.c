@@ -88,7 +88,7 @@ int getDirInBlock(char* blockBuf, SearchValue searchValue, SearchType searchType
             case Search_Name:
                 if (strcmp(searchValue.name, name) == 0)
                 {
-                    if (dp->file_type == (int)fileType)
+                    if (dp->file_type == (int)fileType || fileType == type_Any)
                     {
                         // return the found DIR
                         *result = *dp;
@@ -104,7 +104,7 @@ int getDirInBlock(char* blockBuf, SearchValue searchValue, SearchType searchType
             case Search_INum:
                 if (dp->inode == searchValue.inumber)
                 {
-                    if (dp->file_type == (int)fileType)
+                    if (dp->file_type == (int)fileType || fileType == type_Any)
                     {
                         *result = *dp;
                         return 0;

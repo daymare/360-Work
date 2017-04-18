@@ -60,7 +60,8 @@ typedef enum fileType
 {
     type_Directory = 2,
     type_Link = 7,
-    type_File = 1
+    type_File = 1,
+    type_Any = 42
 } FileType;
 
 
