@@ -8,6 +8,7 @@
 #include "commands/cd.h"
 #include "commands/ls.h"
 #include "commands/pwd.h"
+#include "commands/unlink.h"
 
 
 void runCommands(Pipe *commands);

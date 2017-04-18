@@ -14,8 +14,8 @@ general.o: main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o 
 	ld -r main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o blockUtil.o mInodeUtil.o getDir.o dirUtil.o -o general.o
 
 # link commands together
-commands.o: mount_root.o cd.o ls.o pwd.o
-	ld -r mount_root.o cd.o ls.o pwd.o -o commands.o
+commands.o: mount_root.o cd.o ls.o pwd.o unlink.o
+	ld -r mount_root.o cd.o ls.o pwd.o unlink.o -o commands.o
 
 
 # general files
@@ -62,6 +62,8 @@ cd.o: src/commands/cd.c header/commands/cd.h
 pwd.o: src/commands/pwd.c header/commands/pwd.h
 	$(CC) $(CC_FLAGS) -c src/commands/pwd.c
 
+unlink.o: src/commands/unlink.c header/commands/unlink.h
+	$(CC) $(CC_FLAGS) -c src/commands/unlink.c
 
 
 
