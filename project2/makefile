@@ -10,8 +10,8 @@ project: general.o commands.o
 	$(CC) $(CC_FLAGS) general.o commands.o -o project
 
 # link general files together
-general.o: main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o blockUtil.o mInodeUtil.o getDir.o
-	ld -r main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o blockUtil.o mInodeUtil.o getDir.o -o general.o
+general.o: main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o blockUtil.o mInodeUtil.o getDir.o dirUtil.o
+	ld -r main.o parser.o interpreter.o dataStructures.o globals.o inodeUtil.o blockUtil.o mInodeUtil.o getDir.o dirUtil.o -o general.o
 
 # link commands together
 commands.o: mount_root.o cd.o ls.o pwd.o
@@ -45,6 +45,9 @@ mInodeUtil.o: src/mInodeUtil.c header/mInodeUtil.h
 
 getDir.o: src/getDir.c header/getDir.h
 	$(CC) $(CC_FLAGS) -c src/getDir.c
+
+dirUtil.o: src/dirUtil.c header/dirUtil.h
+	$(CC) $(CC_FLAGS) -c src/dirUtil.c
 
 # commands
 mount_root.o: src/commands/mount_root.c header/commands/mount_root.h

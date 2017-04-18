@@ -48,16 +48,52 @@ int findFileInode(INODE* parent, char* filename, FileType type, INODE* result)
 
         found = findInodeInBlock(buf, filename, type, result);
 
-        if (found == 1)
+        if (found != 0)
         {
-            return 1;
+            return found;
         }
     }
 
+    found = findInodeInIndirectBlock(parent->i_block[12], 1, filename, type, result);
+    if (found != 0) return found;
+    found = findInodeInIndirectBlock(parent->i_block[13], 2, filename, type, result);
+    if (found != 0) return found;
+    found = findInodeInIndirectBlock(parent->i_block[14], 3, filename, type, result);
+    if (found != 0) return found;
+
     printf("file not found!!!\n");
     return 0;
+}
 
-    // TODO indirect blocks
+int findInodeInIndirectBlock(int blockNum, int numIndirections, char* filename, FileType type, INODE* result)
+{
+    // valid block?
+    if (blockNum == 0)
+        return 1;
+
+    char block[BLKSIZE];
+    get_block(fd, blockNum, block);
+
+    // check for no indirections
+    if (numIndirections == 0)
+        return findInodeInBlock(block, filename, type, result);
+
+    // loop through the indirected blocks
+    int i = 0;
+    int* indirection = &block;
+    int returnResult = 0;
+
+    for (i = 0;  i < 256; i++)
+    {
+        returnResult = findInodeInIndirectBlock(indirection[i], numIndirections-1, filename, type, result)
+
+        if (result == 0)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 int findInodeInBlock(char* blockBuf, char* filename, FileType type, INODE* result)
@@ -80,7 +116,7 @@ int findInodeInBlock(char* blockBuf, char* filename, FileType type, INODE* resul
                 // get the inode of this file
                 int inum = dp->inode;
                 getInode(inum, result);
-                return 1;
+                return inum;
             }
             else
             {

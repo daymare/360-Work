@@ -64,6 +64,19 @@ typedef enum fileType
 } FileType;
 
 
+typedef enum searchType
+{
+    Search_Name,
+    Search_INum
+}SearchType;
+
+typedef union searchValue
+{
+    int inumber;
+    char* name;
+}SearchValue;
+
+
 
 // Parser Data Structures
 typedef struct ioRedirect

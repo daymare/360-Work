@@ -59,7 +59,7 @@ int getDirInIndirectBlock(int blockNum, SearchValue searchValue, SearchType sear
     int* indirection = &block;
     int result = 0;
 
-    for (i = 0; i < 256l; i++)
+    for (i = 0; i < 256; i++)
     {
          result = getDirInIndirectBlock(indirection[i], searchValue, searchType, fileType, numIndirections-1, dir);
 
