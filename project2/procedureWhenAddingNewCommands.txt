@@ -6,6 +6,8 @@ create command.h and command.c in the header/command and src/command directories
 add command to the commands section of the makefile
     make sure command is linked to the commands.o so it gets linked with everything else.
 
+add command to interpreter.c and interpreter.h so we can actually call it in the project. 
+
 
 
 
