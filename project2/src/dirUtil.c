@@ -1,5 +1,5 @@
 
-#incude "../header/dirUtil.h"
+#include "../header/dirUtil.h"
 
 
 int addDIR(int parentIno, int ino, char* name);
@@ -15,11 +15,11 @@ int addDIR(int parentIno, int ino, char* name);
 
 
 
-int findBlockWDir(int parent, SearchValue sv, SearchType st)
+int findBlockWDir(int parentInum, SearchValue sv, SearchType st)
 {
     // get the parent inum
     INODE parent;
-    getInode(parentNum, &parent);
+    getInode(parentInum, &parent);
 
     // find which block contains the dir
     int i = 0; 
@@ -94,17 +94,17 @@ DIR* getDirPointer(char* blockBuf, SearchValue sv, SearchType st, DIR** dirBefor
         memcpy(name, dp->name, dp->name_len);
         name[dp->name_len] = '\0';
         
-        switch (searchType)
+        switch (st)
         {
             case Search_Name:
-                if (strcmp(searchValue.name, name) == 0)
+                if (strcmp(sv.name, name) == 0)
                 {
                     // return the found DIR
                     return dp;
                 }
                 break;
             case Search_INum:
-                if (dp->inode == searchValue.inumber)
+                if (dp->inode == sv.inumber)
                 {
                     // return the found DIR
                     return dp;
@@ -155,7 +155,7 @@ int removeDIR(int parent, SearchValue sv, SearchType st)
     if (nextDir >= block + BLKSIZE)
     {
         // update the previous dir
-        previousDir->rec_len = (int)(block + BLKSIZE - previousDir);
+        previousDir->rec_len = (int)(block + BLKSIZE - (char*)previousDir);
         put_block(fd, resultBlock, block);
         return 0;
     }
@@ -169,8 +169,8 @@ int removeDIR(int parent, SearchValue sv, SearchType st)
         memcpy(currentDir, nextDir, recLen);
 
         // shift pointers
-        char* currentDir += recLen;
-        char* nextDIR += recLen;
+        currentDir += recLen;
+        nextDir += recLen;
     }
 
     // currentDirectory should be pointing at the last directory in the block
