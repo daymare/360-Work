@@ -120,7 +120,7 @@ DIR* getDirPointer(char* blockBuf, SearchValue sv, SearchType st, DIR** dirBefor
     return NULL;
 }
 
-// remove the given dir from its parent directory
+// remove the specified dir from its parent directory
 // returns whether the dir was successfully removed or not.
 int removeDIR(int parent, SearchValue sv, SearchType st)
 {
@@ -161,16 +161,16 @@ int removeDIR(int parent, SearchValue sv, SearchType st)
     }
 
     // shuffle up the remaining dirs
-    while(nextDir < (int)(block + BLKSIZE))
+    while(nextDir < block + BLKSIZE)
     {
         // copy down
         DIR* nextDIR = (DIR*)nextDir;
         int recLen = nextDIR->rec_len;
-        memcpy(currentDir, nextDir, recLen);
+        memmove(currentDir, nextDir, recLen);
 
-        // shift pointers
-        currentDir += recLen;
+        // update next pointer
         nextDir += recLen;
+        currentDir += recLen;
     }
 
     // currentDirectory should be pointing at the last directory in the block

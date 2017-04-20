@@ -4,12 +4,12 @@
 
 int get_block(int fd, int blk, char buf[ ])
 {
-  lseek(fd, (long)blk*BLKSIZE, 0);
+  lseek(fd, (long)blk*BLKSIZE, SEEK_SET);
   read(fd, buf, BLKSIZE);
 }
 int put_block(int fd, int blk, char buf[ ])
 {
-  lseek(fd, (long)blk*BLKSIZE, 0);
+  lseek(fd, (long)blk*BLKSIZE, SEEK_SET);
   write(fd, buf, BLKSIZE);
 }
 
@@ -42,7 +42,7 @@ int clr_bit(char *buf, int bit)
 // load a filesystem into memory
 void loadFilesystem(char* filesystem_file)
 {
-    dev = fd = open(filesystem_file, O_RDONLY);
+    dev = fd = open(filesystem_file, O_RDWR);
     if (fd < 0)
     {
         printf("open %s failed!\n", filesystem_file);
