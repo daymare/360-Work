@@ -1,8 +1,8 @@
 #include "../header/interpreter.h"
 
-char* commandNames[] = {"ls", "cd", "pwd", "unlink", "mkdir", "touch", 0};
+char* commandNames[] = {"ls", "cd", "pwd", "unlink", "link", "mkdir", "touch", 0};
 
-int (*commandPointers[])(Command*) = {(int (*)()) ls, cd, pwd, unlink, mkDir, creat_file};
+int (*commandPointers[])(Command*) = {(int (*)()) ls, cd, pwd, unlink, link, mkDir, creat_file};
 
 
 // returns the index in the commandPointers array of the given command
