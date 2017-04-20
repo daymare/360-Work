@@ -1,0 +1,13 @@
+ls
+mkdir foo
+cd foo
+ls
+mkdir bar
+ls
+cd ..
+ls
+touch file
+ls
+cd file
+pwd
+q

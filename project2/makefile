@@ -9,4 +9,4 @@ project:
 
 
 clean:
-	rm -f *.o lab6
+	rm project

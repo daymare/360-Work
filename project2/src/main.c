@@ -12,16 +12,16 @@
 
 int init(void)
 {
-    // initialize all Minodes 
+    // initialize all Minodes
     int i = 0;
     for (i = 0; i < NMINODE; i++)
     {
-    minode[i].dev = 0;
-    minode[i].ino = 0;
-    minode[i].refCount = 0;
-    minode[i].dirty = 0;
-    minode[i].mounted = 0;
-    minode[i].mptr = NULL;
+        minode[i].dev = 0;
+        minode[i].ino = 0;
+        minode[i].refCount = 0;
+        minode[i].dirty = 0;
+        minode[i].mounted = 0;
+        minode[i].mptr = NULL;
     }
 
     // initialize procs
@@ -37,11 +37,19 @@ int init(void)
     running = &proc[0];
 }
 
-
-int main(int argc, char** argv, char** env)
+int main(int argc, char **argv, char **env)
 {
     // initialize the filesystem
-    loadFilesystem("mydisk");
+    if (argc < 2)
+    {
+        printf("default filesystem\n");
+        loadFilesystem("mydisk");
+    }
+    else
+    {
+        printf("filesystem:%s\n", argv[1]);
+        loadFilesystem(argv[1]);
+    }
     loadBlocks();
     checkSuper();
 
@@ -64,13 +72,12 @@ int main(int argc, char** argv, char** env)
         char cbuf[128];
         memset(input, 0, 128);
         fgets(input, 128, stdin);
-        input[strlen(input)-1] = '\0';
+        input[strlen(input) - 1] = '\0';
         strcpy(cbuf, input);
         kpathnamehelper(cbuf);
 
-
         // parse input
-        Pipe* commands;
+        Pipe *commands;
         parseCommands(input, &commands);
 
         // check for quit command
@@ -79,7 +86,6 @@ int main(int argc, char** argv, char** env)
         // if (strcmp(commands->command.tokenizedCommand[0], "q") == 0)
         //    return 0;
 
-
         // run commands
         runCommands(commands);
 
@@ -87,8 +93,7 @@ int main(int argc, char** argv, char** env)
         freePipe(commands);
     }
 
-    printf("\n");// so when we exit our shell the actual shell comes up in the right place.
+    printf("\n"); // so when we exit our shell the actual shell comes up in the right place.
 
     return 0;
 }
-
