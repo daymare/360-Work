@@ -22,6 +22,13 @@ int findInodeAbsPath(Path* filepath, INODE* result, FileType endType);
 // get the index of an inode corresponding to the given path
 int findInodeIndex(Path* filepath, FileType endType);
 
+//Kristopher is the fucking best
+int decFreeInodes();
+int ialloc();
+int deialloc();
+int kiput(MINODE *mip);
+
+
 
 
 
