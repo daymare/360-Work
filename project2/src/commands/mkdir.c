@@ -53,7 +53,6 @@ int mymkdir(MINODE *pip, char *name)
     char dbuf[BLKSIZE];
 
     mip = iget(dev, ino);
-    ip = &mip->INODE;
     INODE *ip = &mip->INODE;
     ip->i_mode = 040755;      // OR 040755: DIR type and permissions
     ip->i_uid = running->uid; // Owner uid
@@ -87,7 +86,7 @@ int mymkdir(MINODE *pip, char *name)
     parentdir.inode = pip->ino;
     parentdir.file_type = EXT2_FT_DIR;
     strcpy(parentdir.name, "..");
-    memcpy((dbuf + 12), &parentdir, 16); //if memcopy doesnt work use pointers
+    memcpy((dbuf + 12), &parentdir, 12); //if memcopy doesnt work use pointers
 
     put_block(dev, bno, dbuf);
 
