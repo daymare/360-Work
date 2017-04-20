@@ -4,12 +4,12 @@
 
 int get_block(int fd, int blk, char buf[ ])
 {
-  lseek(fd, (long)blk*BLKSIZE, 0);
+  lseek(fd, (long)blk*BLKSIZE, SEEK_SET);
   read(fd, buf, BLKSIZE);
 }
 int put_block(int fd, int blk, char buf[ ])
 {
-  lseek(fd, (long)blk*BLKSIZE, 0);
+  lseek(fd, (long)blk*BLKSIZE, SEEK_SET);
   write(fd, buf, BLKSIZE);
 }
 

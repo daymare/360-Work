@@ -72,6 +72,20 @@ void getInode(int index, INODE* result)
     getInodeFromBlock(buf, inum, result);
 }
 
+void putInode(int index, INODE* inode)
+{
+    // get block
+    int iblock = (index-1) / 8;
+    int istart = gp->bg_inode_table;
+    get_block(fd, istart + iblock, buf);
+
+    // put inode in place
+    int inum = (index-1) % 8;
+    memcpy((INODE*)fd + inum, inode, sizeof(INODE));
+
+    put_block(fd, iblock, buf);
+}
+
 void getInodeFromBlock(char* iblock, int index, INODE* result)
 {
     // copy INODE from block into structure
@@ -191,11 +205,38 @@ int findInodePath(INODE* startingNode, Path* path, INODE* result, FileType endTy
 
 int findInodeAbsPath(Path* filepath, INODE* result, FileType endType)
 {
-    // search for the desired INODE
+    // check path is empty
+    if (strcmp(filepath->baseName, "") == 0)
+    {
+        if (endType == type_File)
+        {
+            return 0;
+        }
+
+        getRootInode(result);
+        return 2;
+    }
+
+    // search for the desired inode
     INODE root;
     getRootInode(&root);
 
     return findInodePath(&root, filepath, result, endType);
+}
+
+int findInode(Path* filepath, FileType endType, INODE* result)
+{
+    // absolute or relative?
+    if (filepath->pathType == AbsolutePath)
+    {
+        // return absolute path result
+        return findInodeAbsPath(filepath, result, endType);
+    }
+    else
+    {
+        // return relative path result
+        return findInodePath(&(running->cwd->INODE), filepath, result, endType);
+    }
 }
 
 int findInodeIndex(Path* filepath, FileType endType)
