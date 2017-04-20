@@ -64,7 +64,7 @@ int printDirectory(int blockNum)
         name[currentDir->name_len] = '\0';
 
         // pick fancy color based on file type
-        switch(currentDir->file_type)
+        /*switch(currentDir->file_type)
         {
             case 1: // regular file. Boring.
                 strcpy(color, ANSI_COLOR_RESET);
@@ -76,10 +76,10 @@ int printDirectory(int blockNum)
             defualt:
                 strcpy(color, ANSI_COLOR_RESET);
                 break;
-        }
+        }*/
 
         // print out the entry
-        printf("%s%s%s  ", color, name, ANSI_COLOR_RESET);
+        printf("%s\n", name);
         numChars += currentDir->name_len;
 
         if (numChars > 50)

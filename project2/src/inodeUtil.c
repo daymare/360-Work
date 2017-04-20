@@ -67,7 +67,7 @@ void getInode(int index, INODE* result)
     int istart = gp->bg_inode_table;
     get_block(fd, istart + iblock, buf);
 
-    // get inode
+    // get INODE
     int inum = (index-1) % 8;
     getInodeFromBlock(buf, inum, result);
 }
@@ -88,15 +88,15 @@ void putInode(int index, INODE* inode)
 
 void getInodeFromBlock(char* iblock, int index, INODE* result)
 {
-    // copy inode from block into structure
+    // copy INODE from block into structure
     memcpy(result, (INODE*)iblock + index, sizeof(INODE));
 }
 
 
 void getRootInode(INODE* result)
 {
-    // root inode is always 2
-    // get inode 2
+    // root INODE is always 2
+    // get INODE 2
     getInode(2, result);
 }
 
@@ -133,7 +133,7 @@ int findFileInode(INODE* parent, char* filename, FileType type, INODE* result)
 }
 
 
-// returns the index of the inode in a block
+// returns the index of the INODE in a block
 int findInodeIndexInBlock(char* blockBuf, char* filename, FileType type)
 {
     // search a block 
@@ -150,7 +150,7 @@ int findInodeIndexInBlock(char* blockBuf, char* filename, FileType type)
         {
             if (dp->file_type == (int)type)
             {
-                // get the inode of this file
+                // get the INODE of this file
                 int inum = dp->inode;
                 return inum;
             }
@@ -199,7 +199,7 @@ int findInodePath(INODE* startingNode, Path* path, INODE* result, FileType endTy
         currentNode = nextNode;
     }
 
-    // get the last inode
+    // get the last INODE
     return findFileInode(&currentNode, path->baseName, endType, result);
 }
 
@@ -241,18 +241,120 @@ int findInode(Path* filepath, FileType endType, INODE* result)
 
 int findInodeIndex(Path* filepath, FileType endType)
 {
-    INODE dummyInode;
+    INODE dummyINODE;
     // absolute or relative?
     if (filepath->pathType == AbsolutePath)
     {
         // return absolute path result
-        return findInodeAbsPath(filepath, &dummyInode, endType);
+        return findInodeAbsPath(filepath, &dummyINODE, endType);
     }
     else
     {
         // return relative path result
-        return findInodePath(&(running->cwd->INODE), filepath, &dummyInode, endType);
+        return findInodePath(&(running->cwd->INODE), filepath, &dummyINODE, endType);
     }
 }
 
+int decFreeInodes()
+{
+  char buf[BLKSIZE];
+
+  // dec free INODEs count in SUPER and GD
+  get_block(dev, 1, buf);
+  sp = (SUPER *)buf;
+  sp->s_free_inodes_count--;
+  put_block(dev, 1, buf);
+
+  get_block(dev, 2, buf);
+  gp = (GD *)buf;
+  gp->bg_free_inodes_count--;
+  put_block(dev, 2, buf);
+}
+
+int incFreeInodes()
+{
+  char buf[BLKSIZE];
+
+  // dec free INODEs count in SUPER and GD
+  get_block(dev, 1, buf);
+  sp = (SUPER *)buf;
+  sp->s_free_inodes_count++;
+  put_block(dev, 1, buf);
+
+  get_block(dev, 2, buf);
+  gp = (GD *)buf;
+  gp->bg_free_inodes_count++;
+  put_block(dev, 2, buf);
+}
+
+int ialloc()
+{
+  char buf[BLKSIZE];
+
+  // read INODE_bitmap block
+  get_block(dev, imap, buf);
+
+  for (int i = 0; i < NMINODE; i++)
+  {
+    if (tst_bit(buf, i) == 0)
+    {
+      set_bit(buf, i);
+      decFreeInodes();
+
+      put_block(dev, imap, buf);
+
+      return i + 1;
+    }
+  }
+  printf("ialloc(): no more free INODEs\n");
+  return 0;
+}
+
+int deialloc()
+{
+  char buf[BLKSIZE];
+
+  // read INODE_bitmap block
+  get_block(dev, imap, buf);
+
+  for (int i = 0; i < ninodes; i++)
+  {
+    if (tst_bit(buf, i) == 0)
+    {
+      clr_bit(buf, i);
+      incFreeInodes();
+
+      put_block(dev, imap, buf);
+
+      return i + 1;
+    }
+  }
+  printf("ialloc(): no more free INODEs\n");
+  return 0;
+}
+
+int kiput(MINODE *mip)
+{
+  int blk, offset;
+  mip->refCount--;
+  char dbuf[BLKSIZE];
+
+  if (mip->refCount > 0)
+    return 0;
+  if (!mip->dirty)
+    return 0;
+
+  printf("iput: dev=%d ino=%d\n", mip->dev, mip->ino);
+
+  blk = (((mip->ino) - 1) / 8) + iblock;
+  offset = ((mip->ino) - 1) % 8;
+
+  get_block(mip->dev, blk, dbuf);
+
+  ip = (INODE *)dbuf + offset;
+  *ip = mip->INODE;
+
+  put_block(mip->dev, blk, dbuf);
+  return 1;
+}
 

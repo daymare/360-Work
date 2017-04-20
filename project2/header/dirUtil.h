@@ -4,7 +4,7 @@
 #include "dataStructures.h"
 #include "globals.h"
 
-int addDIR(int parentIno, int ino, char* name);
+int addDIR(MINODE *pip, int ino, char *dirName, int filetype);
 int removeDIR(int parent, SearchValue sv, SearchType st);
 
 

@@ -2,7 +2,105 @@
 #include "../header/dirUtil.h"
 
 
-int addDIR(int parentIno, int ino, char* name);
+int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
+{
+    DIR newdir;
+    char dbuf[BLKSIZE]; // buffer for directory
+    char sbuf[BLKSIZE]; //buffer for string compare
+    DIR *dp;
+    char *cp;
+    int ideal_len = 0;    //ideal length for dir entrys
+    int need_len = 0;     // how much space is needed for new dir entry
+    int remain_space = 0; //Use to compare space left in dir buf is enough to add new dir struct
+    int blk = 0;
+    int i_blockzero = 0;
+
+    for (int x = 0; x < 12; x++)
+    {
+        i_blockzero = pip->INODE.i_block[x];
+        if (i_blockzero == 0) //find the ith data block
+        {
+            i_blockzero = pip->INODE.i_block[x - 1];
+
+            get_block(pip->dev, pip->INODE.i_block[x - 1], dbuf);
+
+            dp = (DIR *)dbuf;
+            cp = dbuf;
+
+            while (cp + dp->rec_len < dbuf + BLKSIZE) //look for function that does this for you
+            {
+
+                cp += dp->rec_len;
+                dp = (DIR *)cp;
+            }
+
+            ideal_len = 4 * ((8 + dp->name_len + 3) / 4); //find the ideal length of the last dir entry
+            remain_space = dp->rec_len - ideal_len;
+            int newdirnamelength = strlen(dirName);
+            need_len = 4 * ((8 + newdirnamelength + 3) / 4);
+
+            if (remain_space >= need_len) //enough space to add new dir to end of block
+            {
+                dp->rec_len = ideal_len; //truncate last entry to make room for new entry
+                cp += dp->rec_len;  //move pointer forward so we can save new dir at end of dir entrys off by 1 error??
+
+                /*
+                        __u32 *dino = (__u32 *)cp;
+                        __u16 *rlen = (__u16 *)cp + 4;
+                        __u8 *nlen = (__u8 *)cp + 6;
+                        char *name = (char *)cp + 8;
+
+                        *dino = ino;
+                        *rlen = remain_space;
+                        *nlen = strlen(dirName);
+                        strcpy(name, dirName);
+                        */
+                newdir.inode = ino;
+                newdir.file_type = filetype;
+                newdir.rec_len = remain_space;
+                newdir.name_len = strlen(dirName);
+                strcpy(newdir.name, dirName);
+                memcpy(cp, &newdir, need_len); //if memcopy doesnt work use pointers
+                put_block(dev, i_blockzero, dbuf);
+                return 1;
+            }
+            else //need to make a new block for dir also increment parent size by 1024
+            {
+                int newblock = balloc();
+
+                pip->INODE.i_block[x] = newblock;
+                i_blockzero = newblock;
+
+                get_block(dev, i_blockzero, dbuf);
+                cp = dbuf;
+                dp = (DIR *)dbuf;
+
+                /*
+                        __u32 *dino = (__u32 *)&dbuf;
+                        __u16 *rlen = (__u16 *)&dbuf + 4;
+                        __u8 *nlen = (__u8 *)&dbuf + 6;
+                        char *dname = (char *)&dbuf + 8;
+
+                        dino = ino;
+                        rlen = BLKSIZE;
+                        nlen = strlen(dirName);
+                        strcpy(dname, dirName);
+                        */
+
+                newdir.inode = ino;
+                newdir.rec_len = BLKSIZE;
+                newdir.file_type = filetype;
+                newdir.name_len = strlen(dirName);
+                strcpy(newdir.name, dirName);
+                memcpy(cp, &newdir, need_len); //if memcopy doesnt work use pointers
+                put_block(dev, newblock, dbuf);
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
 
 
 

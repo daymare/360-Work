@@ -9,6 +9,7 @@
 #include "commands/ls.h"
 #include "commands/pwd.h"
 #include "commands/unlink.h"
+#include "commands/mkdir.h"
 
 
 void runCommands(Pipe *commands);

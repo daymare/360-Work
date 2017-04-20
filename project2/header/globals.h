@@ -38,7 +38,7 @@ int nblocks, ninoes, bmap, imap, iblock;
 int ninodes, nfreeInodes, nfreeBlocks;
 
 char* disk;
-char line[128], cmd[64], pathname[64];
+char line[128], cmd[64], *kpathname[16], kpath[64];
 
 
 
