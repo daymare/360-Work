@@ -1,11 +1,9 @@
 # variables
 CC = gcc
-CC_FLAGS = -Wfatal-errors -m32 -g -w
+CC_FLAGS = -Wfatal-errors -std=c99 -g -w
 
-project: 
+project: src/*.c src/commands/*.c header/*.h header/commands/*.h
 	$(CC) $(CC_FLAGS) src/*.c src/commands/*.c -o project
-
-
 
 
 clean:
