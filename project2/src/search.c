@@ -130,7 +130,6 @@ int search_block(int inblock)
             dp = (DIR *)cp;
             if (cp >= &dbuf[BLKSIZE])
             {
-                printf("ERROR: Directory not found\n");
                 return 0;
             }
         }

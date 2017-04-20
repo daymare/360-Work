@@ -5,6 +5,8 @@ ls
 mkdir bar
 ls
 cd ..
+cd ..
+cd .
 ls
 touch file
 ls
