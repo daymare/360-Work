@@ -101,7 +101,7 @@ int deallocateblock(int blk)
   get_block(dev, bmap, block_buf);
 
   clr_bit(block_buf, blk); //set that block to 1 to show that its being used
-  put_block(dev, bmap, bblock_bufuf);
+  put_block(dev, bmap, block_buf);
 }
 
 int balloc()

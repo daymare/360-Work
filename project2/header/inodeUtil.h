@@ -27,7 +27,7 @@ int findInodeIndex(Path* filepath, FileType endType);
 //Kristopher is the fucking best
 int decFreeInodes();
 int ialloc();
-int deialloc();
+int deialloc(int inode);
 int kiput(MINODE *mip);
 
 
