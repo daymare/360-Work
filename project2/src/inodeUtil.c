@@ -357,3 +357,52 @@ int kiput(MINODE *mip)
 
 }
 
+
+void truncatePath(Path* path)
+{
+    if (strcmp(path->tokenizedPath[0], "") == 0)
+    {
+        if (path->pathType == AbsolutePath)
+        {
+            strcpy(path->baseName, "");
+        }
+        else
+        {
+            strcpy(path->baseName, ".");
+        }
+        return;
+    }
+
+    // find the end of the tokenizedPath
+    int i = 0;
+    while(strcmp(path->tokenizedPath[i+1], "") != 0)
+        i++;
+    // i is now the last index in tokenizedPath
+
+    // move i index to baseName
+    strcpy(path->tokenizedPath[i], path->baseName);
+    strcpy(path->tokenizedPath[i], "");
+}
+
+int getParentInode(Path* path, INODE* inode)
+{
+    Path tempPath = *path;
+
+    // truncate the base name off the end of the path
+    truncatePath(&tempPath);
+
+    // get the parent inode
+    int result = findInode(&tempPath, type_Directory, inode);
+
+    if (result == 0)
+    {
+        printf("failed to get parent inode!");
+        exit(1);
+    }
+
+    return result;
+}
+
+
+
+

@@ -6,6 +6,7 @@
 
 int addDIR(MINODE *pip, int ino, char *dirName, int filetype);
 int removeDIR(int parent, SearchValue sv, SearchType st);
+int findDir(Path* path, FileType fileType, DIR* result);
 
 
 #endif

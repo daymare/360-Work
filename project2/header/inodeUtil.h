@@ -31,6 +31,11 @@ int deialloc();
 int kiput(MINODE *mip);
 
 
+// get parent
+void truncatePath(Path* path);
+int getParentInode(Path* path, INODE* inode);
+
+
 
 
 

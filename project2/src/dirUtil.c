@@ -151,6 +151,7 @@ int findBlockWDir(int parentInum, SearchValue sv, SearchType st)
     result = findBlockWDirInIndirectBlock(parent.i_block[14], sv, st, 3);
     if (result != 0) return result;
 
+    return 0;
 }
 
 int findBlockWDirInIndirectBlock(int blockNum, SearchValue sv, SearchType st, int numIndirections)
@@ -218,6 +219,29 @@ DIR* getDirPointer(char* blockBuf, SearchValue sv, SearchType st, DIR** dirBefor
     }
 
     return NULL;
+}
+
+int findDir(Path* path, FileType fileType, DIR* result)
+{
+    int callResult = 0;
+
+    // get the parent dir 
+    INODE parent;
+    callResult = getParentInode(path, &parent);
+
+    if (callResult == 0)
+        exit(0);
+
+    // get the dir
+    SearchValue sv;
+    sv.name = path->baseName;
+    callResult = findBlockWDir(callResult, sv, Search_Name);
+    if (callResult == 0)
+        exit(0);
+    char block[BLKSIZE];
+    get_block(fd, callResult, block);
+    DIR** dummy;
+    *result = *getDirPointer(block, sv, Search_Name, dummy);
 }
 
 // remove the specified dir from its parent directory
