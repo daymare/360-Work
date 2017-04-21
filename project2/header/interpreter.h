@@ -11,7 +11,8 @@
 #include "commands/unlink.h"
 #include "commands/mkdir.h"
 #include "commands/link.h"
-
+#include "commands/open.h"
+#include "commands/close.h"
 
 void runCommands(Pipe *commands);
 
