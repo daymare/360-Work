@@ -93,26 +93,15 @@ void loadBlocks()
     printf("inode table begins at block: %d\n", iblock);
 }
 
-int deallocateballoc(int blk)
+int deallocateblock(int blk)
 {
-  char buf[BLKSIZE];
-  int bmap, nblocks;
-
-  // read super block
-  get_block(dev, 1, buf);
-  sp = (SUPER *)buf;
-  nblocks = sp->s_blocks_count;
-
-  // read group descriptor
-  get_block(dev, 2, buf);
-  gp = (GD *)buf;
-
-  bmap = gp->bg_block_bitmap;
+  char block_buf[BLKSIZE] = {0};
 
   // read block bitmap
-  get_block(dev, bmap, buf);
+  get_block(dev, bmap, block_buf);
 
-  clr_bit(buf, blk); //set that block to 1 to show that its being used
+  clr_bit(block_buf, blk); //set that block to 1 to show that its being used
+  put_block(dev, bmap, bblock_bufuf);
 }
 
 int balloc()
