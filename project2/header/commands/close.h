@@ -3,6 +3,6 @@
 
 #include "../dataStructures.h"
 
-int close(Command* command);
+//int close(Command* command);
 
 #endif

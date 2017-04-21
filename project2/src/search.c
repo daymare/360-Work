@@ -1,40 +1,7 @@
 
 #include "../header/search.h"
 
-int kgetino(int *dev)
-{
-    int i, ino, blk, disp, n;
-    char buf[BLKSIZE];
-    INODE *ip;
-    MINODE *mip;
 
-    if (strcmp(kpath, "/") == 0)
-    {
-        return 2;
-    }
-
-    if (kpath[0] == '/')
-    {
-        mip = iget(*dev, 2);
-    }
-    else
-    {
-        mip = iget(running->cwd->dev, running->cwd->ino);
-    }
-
-    ino = search(dev, 0);
-
-    if (ino == 0)
-    {
-        iput(mip);
-        printf("Pathname does not exist\n");
-        return 0;
-    }
-    iput(mip);
-    mip = iget(dev, ino);
-
-    return ino;
-}
 
 int search(int *dev, int searchnode)
 {

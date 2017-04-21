@@ -3,6 +3,7 @@
 
 #include "dataStructures.h"
 #include "globals.h"
+#include "inodeUtil.h"
 
 int addDIR(MINODE *pip, int ino, char *dirName, int filetype);
 int removeDIR(int parent, SearchValue sv, SearchType st);

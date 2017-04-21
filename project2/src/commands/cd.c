@@ -13,7 +13,7 @@ int cd(Command* command)
     if (strcmp(pathString, "") == 0)
     {
         minode = iget(dev, 2);
-        iput(running->cwd);
+
         running->cwd = minode;
     }
 
@@ -24,7 +24,11 @@ int cd(Command* command)
     // find inode
     int inodeIndex = findInodeIndex(&path, type_Directory);
     minode = iget(dev, inodeIndex);
-    iput(running->cwd);
+    if(&(minode->INODE) == 0)
+    {
+        printf("iget failed to return correct address!\n");
+        exit(1);
+    }
     running->cwd = minode;
 
     return 0;

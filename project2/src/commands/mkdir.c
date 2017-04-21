@@ -39,10 +39,10 @@ int mkDir(Command* command)
 
     mymkdir(pip, child);
 
-    pip->refCount = 0;
-    pip->dirty += 1;
+    pip->refCount = 1;
+    pip->dirty++;
     //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
-//    kiput(pip);
+   iput(pip);
 }
 
 int mymkdir(MINODE *pip, char *name)
@@ -67,18 +67,20 @@ int mymkdir(MINODE *pip, char *name)
     {
         ip->i_block[i] = 0;
     }
-    kiput(mip);
 
     mip->dirty = 1; // mark mINODE dirty
-    kiput(mip);      // write INODE to disk
+    iput(mip);      // write INODE to disk
 
+    char *buffptr = dbuf;
     DIR rootdir;
     rootdir.rec_len = 12;
     rootdir.name_len = 1;
     rootdir.inode = 2;
     rootdir.file_type = EXT2_FT_DIR;
     strcpy(rootdir.name, ".");
-    memcpy(dbuf, &rootdir, 12);
+    memcpy(buffptr, &rootdir, 12);
+
+    buffptr += 12;
 
     DIR parentdir;
     parentdir.rec_len = 1012;
@@ -86,7 +88,7 @@ int mymkdir(MINODE *pip, char *name)
     parentdir.inode = pip->ino;
     parentdir.file_type = EXT2_FT_DIR;
     strcpy(parentdir.name, "..");
-    memcpy((dbuf + 12), &parentdir, 12); //if memcopy doesnt work use pointers
+    memcpy(buffptr, &parentdir, 12); //if memcopy doesnt work use pointers
 
     put_block(dev, bno, dbuf);
 
@@ -128,7 +130,7 @@ int creat_file(Command* command)
     pip->refCount += 1;
     pip->dirty += 1;
     //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
-    kiput(pip);
+    iput(pip);
 }
 
 int my_creat(MINODE *pip, char *name)
@@ -149,8 +151,8 @@ int my_creat(MINODE *pip, char *name)
     ip->i_blocks = 0; // LINUX: Blocks count in 512-byte chunks
     ip->i_size_high = 0;
 
-    kiput(mip);
+    iput(mip);
     mip->dirty = 1; // mark mINODE dirty
     addDIR(pip, ino, name, EXT2_FT_REG_FILE);
-    kiput(mip);      // write INODE to disk
+    iput(mip);      // write INODE to disk
 }

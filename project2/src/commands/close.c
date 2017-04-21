@@ -3,7 +3,7 @@
 #include "../../header/commands/close.h"
 
 
-int close(Command* command)
-{
-}
+//int close(Command* command)
+//{
+//}
 

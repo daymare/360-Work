@@ -333,31 +333,6 @@ int deialloc()
   return 0;
 }
 
-int kiput(MINODE *mip)
-{
-  int blk = 0, offset = 0;
-  mip->refCount--;
-  char dbuf[BLKSIZE] = {0};
-
-  if (mip->refCount > 0)
-    return 0;
-  if (!mip->dirty)
-    return 0;
-
-  blk = (((mip->ino) - 1) / 8) + iblock;
-  offset = ((mip->ino) - 1) % 8;
-
-  get_block(mip->dev, blk, dbuf);
-
-  ip = (INODE *)dbuf + offset;
-  *ip = mip->INODE;
-
-  put_block(mip->dev, blk, dbuf);
-  return 1;
-
-}
-
-
 void truncatePath(Path* path)
 {
     if (strcmp(path->tokenizedPath[0], "") == 0)

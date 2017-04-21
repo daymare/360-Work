@@ -60,6 +60,8 @@ int iput(MINODE *mip)
 // TODO modify to care about where this was mounted
 int iwrite(MINODE *mip)
 {
+    int blk = 0;
+    int offset = 0;
     mip->refCount = 0;
 
     if (mip->dirty)
@@ -67,9 +69,16 @@ int iwrite(MINODE *mip)
         // find block number
         int blockNum = mip->ino;
 
-        // write back to that block number
+        blk = (((blockNum)-1) / 8) + iblock;
+        offset = ((blockNum)-1) % 8;
+
         char inodeBlock[BLKSIZE];
-        memcpy(inodeBlock, &(mip->INODE), BLKSIZE);
-        put_block(fd, blockNum, inodeBlock);
+        get_block(dev, blk, inodeBlock);
+        
+        char *inodeptr = (INODE *)buf + offset;
+
+        // write back to that block number
+        memcpy(inodeptr, &(mip->INODE), sizeof(INODE));
+        put_block(fd, blk, inodeBlock);
     }
 }

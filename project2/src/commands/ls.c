@@ -120,7 +120,7 @@ int ls(Command* command)
     printMinodeDirectory(minode);
 
     // release minode
-    iput(minode);
+
 }
 
 

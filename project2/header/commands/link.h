@@ -6,6 +6,7 @@
 #include "../dirUtil.h"
 #include "../inodeUtil.h"
 
+
 int link(Command* command);
 
 

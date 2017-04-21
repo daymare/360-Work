@@ -41,20 +41,11 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
 
             if (remain_space >= need_len) //enough space to add new dir to end of block
             {
+                printf("ideal length:%d\n", ideal_len);
+                printf("remaining space:%d\n", remain_space);
+                printf("adress to start write:%x\n", cp);
                 dp->rec_len = ideal_len; //truncate last entry to make room for new entry
                 cp += dp->rec_len;  //move pointer forward so we can save new dir at end of dir entrys off by 1 error??
-
-                /*
-                        __u32 *dino = (__u32 *)cp;
-                        __u16 *rlen = (__u16 *)cp + 4;
-                        __u8 *nlen = (__u8 *)cp + 6;
-                        char *name = (char *)cp + 8;
-
-                        *dino = ino;
-                        *rlen = remain_space;
-                        *nlen = strlen(dirName);
-                        strcpy(name, dirName);
-                        */
                 newdir.inode = ino;
                 newdir.file_type = filetype;
                 newdir.rec_len = remain_space;
@@ -76,22 +67,11 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
                 cp = dbuf;
                 dp = (DIR *)dbuf;
 
-                /*
-                        __u32 *dino = (__u32 *)&dbuf;
-                        __u16 *rlen = (__u16 *)&dbuf + 4;
-                        __u8 *nlen = (__u8 *)&dbuf + 6;
-                        char *dname = (char *)&dbuf + 8;
-
-                        dino = ino;
-                        rlen = BLKSIZE;
-                        nlen = strlen(dirName);
-                        strcpy(dname, dirName);
-                        */
-
                 newdir.inode = ino;
                 newdir.rec_len = BLKSIZE;
                 newdir.file_type = filetype;
                 newdir.name_len = strlen(dirName);
+                need_len = 4 * ((8 + newdir.name_len + 3) / 4);
                 strcpy(newdir.name, dirName);
                 memcpy(cp, &newdir, need_len); //if memcopy doesnt work use pointers
                 put_block(dev, newblock, dbuf);

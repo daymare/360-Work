@@ -1,15 +1,13 @@
 ls
-mkdir foo
-cd foo
-ls
-mkdir bar
-ls
-cd ..
-cd ..
-cd .
-ls
-touch file
-ls
-cd file
-pwd
+mkdir fuck1
+mkdir fuck2
+mkdir fuck3
+mkdir fuck4
+mkdir fuck5
+mkdir fuck6
+mkdir fuck7
+mkdir fuck8
+mkdir fuck9
+mkdir fuck10
 q
+
