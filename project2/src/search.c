@@ -250,12 +250,13 @@ void kpathnamehelper(char const *input)
 
     if (strcmp(cmd, "q") == 0 || strcmp(cmd, "quit") == 0 || strcmp(cmd, "exit") == 0)
     {
+        /*
         MINODE *ptr;
         for (int i = 0; minode[i].ino != 0; i++)
         {
             ptr = &(minode[i]);
             iput(ptr);
-        }
+        }*/
         exit(1);
     }
 

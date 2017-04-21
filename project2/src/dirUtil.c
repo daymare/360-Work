@@ -5,10 +5,10 @@
 int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
 {
     DIR newdir;
-    char dbuf[BLKSIZE]; // buffer for directory
-    char sbuf[BLKSIZE]; //buffer for string compare
-    DIR *dp;
-    char *cp;
+    char dbuf[BLKSIZE] = {0}; // buffer for directory
+    char sbuf[BLKSIZE] = {0}; //buffer for string compare
+    DIR *dp = NULL;
+    char *cp = NULL;
     int ideal_len = 0;    //ideal length for dir entrys
     int need_len = 0;     // how much space is needed for new dir entry
     int remain_space = 0; //Use to compare space left in dir buf is enough to add new dir struct
@@ -22,7 +22,7 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
         {
             i_blockzero = pip->INODE.i_block[x - 1];
 
-            get_block(pip->dev, pip->INODE.i_block[x - 1], dbuf);
+            get_block(pip->dev, i_blockzero, dbuf);
 
             dp = (DIR *)dbuf;
             cp = dbuf;
@@ -66,6 +66,7 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
             }
             else //need to make a new block for dir also increment parent size by 1024
             {
+                printf("making new block for dir entry/n");
                 int newblock = balloc();
 
                 pip->INODE.i_block[x] = newblock;
@@ -94,6 +95,7 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
                 strcpy(newdir.name, dirName);
                 memcpy(cp, &newdir, need_len); //if memcopy doesnt work use pointers
                 put_block(dev, newblock, dbuf);
+                pip->INODE.i_size += 1024;
                 return 1;
             }
         }

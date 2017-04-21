@@ -5,16 +5,16 @@ int mkDir(Command* command)
     MINODE *mip = NULL;
     MINODE *pip = NULL;
     int checkforName = 1;
-    int pino, i;
-    char *child;
-    char temp[64];
+    int pino = 0, i = 0;
+    char *child = NULL;
+    char temp[64] = {0};
     checkforName = search(dev, 0);
     if(checkforName != 0)
     {
         printf("Dirname already exitst!\n");
         return 0;
     }
-
+    kpathname[i] = kpath;
     for(i = 0; kpathname[i] !='\0'; i++)
     {
         child = kpathname[i];
@@ -42,7 +42,7 @@ int mkDir(Command* command)
     pip->refCount = 0;
     pip->dirty += 1;
     //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
-    kiput(pip);
+//    kiput(pip);
 }
 
 int mymkdir(MINODE *pip, char *name)
@@ -50,7 +50,7 @@ int mymkdir(MINODE *pip, char *name)
     MINODE *mip = NULL;
     int ino = ialloc();
     int bno = balloc();
-    char dbuf[BLKSIZE];
+    char dbuf[BLKSIZE] = {0};
 
     mip = iget(dev, ino);
     INODE *ip = &mip->INODE;
@@ -91,16 +91,15 @@ int mymkdir(MINODE *pip, char *name)
     put_block(dev, bno, dbuf);
 
     addDIR(pip, ino, name, EXT2_FT_DIR );
-    pip->INODE.i_size += 1024;
 }
 
 int creat_file(Command* command)
 {
     MINODE *mip = NULL;
     MINODE *pip = NULL;
-    int pino, i;
-    char *child;
-    char temp[64];
+    int pino = 0, i = 0;
+    char *child = NULL;
+    char temp[64] = {0};
 
     for(i = 0; kpathname[i] !='\0'; i++)
     {
@@ -136,7 +135,7 @@ int my_creat(MINODE *pip, char *name)
 {
     MINODE *mip = NULL;
     int ino = ialloc();
-    char dbuf[BLKSIZE];
+    char dbuf[BLKSIZE] = {0};
 
     mip = iget(dev, ino);
     ip = &mip->INODE;

@@ -335,16 +335,14 @@ int deialloc()
 
 int kiput(MINODE *mip)
 {
-  int blk, offset;
+  int blk = 0, offset = 0;
   mip->refCount--;
-  char dbuf[BLKSIZE];
+  char dbuf[BLKSIZE] = {0};
 
   if (mip->refCount > 0)
     return 0;
   if (!mip->dirty)
     return 0;
-
-  printf("iput: dev=%d ino=%d\n", mip->dev, mip->ino);
 
   blk = (((mip->ino) - 1) / 8) + iblock;
   offset = ((mip->ino) - 1) % 8;
@@ -356,5 +354,6 @@ int kiput(MINODE *mip)
 
   put_block(mip->dev, blk, dbuf);
   return 1;
+
 }
 
