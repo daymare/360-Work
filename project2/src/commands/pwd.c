@@ -1,6 +1,6 @@
 #include "../../header/commands/pwd.h"
 
-void printdirectory(int inumber, int parentinode)
+void printdirectory(int child, int parentinode)
 {
     int blk = (((parentinode)-1) / 8) + iblock;
     int offset = ((parentinode)-1) % 8;
@@ -25,7 +25,7 @@ void printdirectory(int inumber, int parentinode)
 
         while (cp < &dbuf[BLKSIZE]) //while cp address is less than dbuff max address
         {
-            if (dp->inode == inumber)
+            if (dp->inode == child)
             {
                 while (x < dp->name_len)
                 {

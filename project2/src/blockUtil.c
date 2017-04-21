@@ -117,30 +117,19 @@ int deallocateballoc(int blk)
 
 int balloc()
 {
-  char buf[BLKSIZE];
-  int bmap, nblocks;
-
-  // read super block
-  get_block(dev, 1, buf);
-  sp = (SUPER *)buf;
-  nblocks = sp->s_blocks_count;
-
-  // read group descriptor
-  get_block(dev, 2, buf);
-  gp = (GD *)buf;
-
-  bmap = gp->bg_block_bitmap;
+  char temp_buf[BLKSIZE];
 
   // read block bitmap
-  get_block(dev, bmap, buf);
+  get_block(dev, bmap, temp_buf);
 
   for (int i = 0; i < nblocks; i++)
   {
 
-    if (tst_bit(buf, i) == 0) //find the first open block in the bmap
+    if (tst_bit(temp_buf, i) == 0) //find the first open block in the bmap
     {
-      set_bit(buf, i); //set that block to 1 to show that its being used
-      return i;        //return the bock number
+      set_bit(temp_buf, i); //set that block to 1 to show that its being used
+      put_block(dev, bmap, temp_buf);
+      return i + 1;        //return the bock number 
     }
   }
   printf("FAILED NO BLOCK ALLOCATED!!!!!!!!\n");

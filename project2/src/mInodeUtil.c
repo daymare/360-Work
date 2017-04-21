@@ -62,7 +62,6 @@ int iwrite(MINODE *mip)
 {
     int blk = 0;
     int offset = 0;
-    mip->refCount = 0;
 
     if (mip->dirty)
     {
@@ -74,11 +73,10 @@ int iwrite(MINODE *mip)
 
         char inodeBlock[BLKSIZE];
         get_block(dev, blk, inodeBlock);
-        
-        char *inodeptr = (INODE *)buf + offset;
 
+        ip = (INODE *)inodeBlock + offset;
+        *ip = mip->INODE;
         // write back to that block number
-        memcpy(inodeptr, &(mip->INODE), sizeof(INODE));
         put_block(fd, blk, inodeBlock);
     }
 }

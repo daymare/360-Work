@@ -257,18 +257,18 @@ int findInodeIndex(Path* filepath, FileType endType)
 
 int decFreeInodes()
 {
-  char buf[BLKSIZE];
+  char temp_buf[BLKSIZE] = {0};
 
   // dec free INODEs count in SUPER and GD
-  get_block(dev, 1, buf);
-  sp = (SUPER *)buf;
+  get_block(dev, 1, temp_buf);
+  sp = (SUPER *)temp_buf;
   sp->s_free_inodes_count--;
-  put_block(dev, 1, buf);
+  put_block(dev, 1, temp_buf);
 
-  get_block(dev, 2, buf);
-  gp = (GD *)buf;
+  get_block(dev, 2, temp_buf);
+  gp = (GD *)temp_buf;
   gp->bg_free_inodes_count--;
-  put_block(dev, 2, buf);
+  put_block(dev, 2, temp_buf);
 }
 
 int incFreeInodes()
@@ -289,19 +289,19 @@ int incFreeInodes()
 
 int ialloc()
 {
-  char buf[BLKSIZE];
+  char temp_buf[BLKSIZE] = {0};
 
   // read INODE_bitmap block
-  get_block(dev, imap, buf);
+  get_block(dev, imap, temp_buf);
 
   for (int i = 0; i < NMINODE; i++)
   {
-    if (tst_bit(buf, i) == 0)
+    if (tst_bit(temp_buf, i) == 0)
     {
-      set_bit(buf, i);
+      set_bit(temp_buf, i);
       decFreeInodes();
 
-      put_block(dev, imap, buf);
+      put_block(dev, imap, temp_buf);
 
       return i + 1;
     }

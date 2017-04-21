@@ -25,24 +25,21 @@ int mkDir(Command* command)
     }
     if (kpath[0] == '/')
     {
-        mip = root;
+        pip = root;
         dev = root->dev;
-        pino = search(dev, 0);
     }
     else
     {
-        mip = running->cwd;
+        pip = running->cwd;
         dev = running->cwd->dev;
-        pino = running->cwd->ino;
     }
-    pip = iget(dev, pino);
 
     mymkdir(pip, child);
 
-    pip->refCount = 1;
+    pip->refCount++;
     pip->dirty++;
     //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
-   iput(pip);
+   iwrite(pip);
 }
 
 int mymkdir(MINODE *pip, char *name)
@@ -53,42 +50,41 @@ int mymkdir(MINODE *pip, char *name)
     char dbuf[BLKSIZE] = {0};
 
     mip = iget(dev, ino);
-    INODE *ip = &mip->INODE;
-    ip->i_mode = 040755;      // OR 040755: DIR type and permissions
-    ip->i_uid = running->uid; // Owner uid
+    INODE *inodeptr = &mip->INODE;
+    inodeptr->i_mode = 040755;      // OR 040755: DIR type and permissions
+    inodeptr->i_uid = running->uid; // Owner uid
     //ip->i_gid = running->gid;                   // Group Id
-    ip->i_size = BLKSIZE;  // Size in bytes
-    ip->i_links_count = 2; // Links count=2 because of . and ..
+    inodeptr->i_size = BLKSIZE;  // Size in bytes
+    inodeptr->i_links_count = 2; // Links count=2 because of . and ..
     //ip->i_atime = i_ctime = i_mtime = time(0L); // set to current time
-    ip->i_blocks = 2; // LINUX: Blocks count in 512-byte chunks
-    ip->i_block[0] = bno;
-    ip->i_size_high = 0;
+    inodeptr->i_blocks = 2; // LINUX: Blocks count in 512-byte chunks
+    inodeptr->i_block[0] = bno;
+    inodeptr->i_size_high = 0;
     for (int i = 1; i < 15; i++)
     {
-        ip->i_block[i] = 0;
+        inodeptr->i_block[i] = 0;
     }
 
+    mip->refCount++;
     mip->dirty = 1; // mark mINODE dirty
-    iput(mip);      // write INODE to disk
+    iwrite(mip);      // write INODE to disk
 
-    char *buffptr = dbuf;
     DIR rootdir;
-    rootdir.rec_len = 12;
-    rootdir.name_len = 1;
-    rootdir.inode = ino;
+    rootdir.rec_len = (__u16*)12;
+    rootdir.name_len = (__u8*)1;
+    rootdir.inode = (__u32*)ino;
     rootdir.file_type = EXT2_FT_DIR;
-    strcpy(rootdir.name, ".");
-    memcpy(buffptr, &rootdir, 12);
-
-    buffptr += 12;
+    rootdir.name[0] = '.';
+    memcpy(dbuf, &rootdir, 9);
 
     DIR parentdir;
-    parentdir.rec_len = 1012;
-    parentdir.name_len = 2;
-    parentdir.inode = pip->ino;
+    parentdir.rec_len = (__u16*)1012; 
+    parentdir.name_len = (__u8*)2;   
+    parentdir.inode = (__u32*)pip->ino;  
     parentdir.file_type = EXT2_FT_DIR;
-    strcpy(parentdir.name, "..");
-    memcpy(buffptr, &parentdir, 12); //if memcopy doesnt work use pointers
+    parentdir.name[0] = '.';
+    parentdir.name[1] = '.';
+    memcpy(dbuf+12, &parentdir, 10);
 
     put_block(dev, bno, dbuf);
 

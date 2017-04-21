@@ -1,48 +1,46 @@
 
 #include "../header/search.h"
 
-
-
 int search(int *dev, int searchnode)
 {
     char dbuf[BLKSIZE]; //buffer to load root dir
     char sbuf[BLKSIZE]; //buffer to for loading dir names for use in strcmp
-    int ino, i_blockzero, blk, offset;
+    int ino, block_number, offset;
     int *indirect;
     if (searchnode != 0)
     {
-        blk = (((searchnode)-1) / 8) + iblock;
+        block_number = (((searchnode)-1) / 8) + iblock;
         offset = ((searchnode)-1) % 8;
     }
     else
     {
-        blk = iblock;
+        block_number = iblock;
         offset = 1;
     }
-    get_block(dev, blk, buf);
+    get_block(dev, block_number, buf);
     ip = (INODE *)buf + offset;
     // Add one giving us the root INODE
 
     for (int x = 0; x < 12; x++)
     {
-        i_blockzero = ip->i_block[x];
-        if (i_blockzero == 0)
+        block_number = ip->i_block[x];
+        if (block_number == 0)
         {
             break;
         }
-        ino = search_block(i_blockzero);
+        ino = search_block(block_number);
     }
     if (ip->i_block[12] != 0)
     {
 
-        get_block(dev, i_blockzero, dbuf);
+        get_block(dev, block_number, dbuf);
         indirect = dbuf;
         ino = search_indirect(indirect);
     }
     if (ip->i_block[13] != 0)
     {
 
-        get_block(dev, i_blockzero, dbuf);
+        get_block(dev, block_number, dbuf);
         indirect = dbuf;
         ino = search_double_indirect(indirect, dev);
     }
@@ -50,7 +48,7 @@ int search(int *dev, int searchnode)
     return ino;
 }
 
-int search_block(int inblock)
+int search_block(int searchblk)
 {
     char dbuf[BLKSIZE];
     char buf[BLKSIZE];
@@ -58,7 +56,7 @@ int search_block(int inblock)
     DIR *dp;
     char *cp;
     int blk, offset, x = 0;
-    get_block(dev, inblock, dbuf);
+    get_block(dev, searchblk, dbuf);
 
     cp = dbuf;
     dp = (DIR *)dbuf;
@@ -80,7 +78,7 @@ int search_block(int inblock)
                 if (dp->file_type == 2)
                 {
 
-                    blk = (((dp->inode) - 1) / 8) + inblock;
+                    blk = (((dp->inode) - 1) / 8) + searchblk;
                     offset = ((dp->inode) - 1) % 8;
 
                     get_block(fd, blk, buf);
@@ -106,16 +104,16 @@ int search_block(int inblock)
 
 int search_indirect(int *iblock_array)
 {
-    int i_blockzero, ino;
+    int block_number, ino;
 
     for (int i = 0; i < 256; i++)
     {
-        i_blockzero = iblock_array[i];
-        if (i_blockzero == 0)
+        block_number = iblock_array[i];
+        if (block_number == 0)
         {
             break;
         }
-        ino = search_block(i_blockzero);
+        ino = search_block(block_number);
     }
     return ino;
 }
@@ -217,14 +215,13 @@ void kpathnamehelper(char const *input)
 
     if (strcmp(cmd, "q") == 0 || strcmp(cmd, "quit") == 0 || strcmp(cmd, "exit") == 0)
     {
-        /*
         MINODE *ptr;
         for (int i = 0; minode[i].ino != 0; i++)
         {
             ptr = &(minode[i]);
             iput(ptr);
-        }*/
-        exit(1);
+            exit(1);
+        }
     }
 
     if (dummypath[1] != NULL)
