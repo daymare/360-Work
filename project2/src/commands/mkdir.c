@@ -75,7 +75,7 @@ int mymkdir(MINODE *pip, char *name)
     DIR rootdir;
     rootdir.rec_len = 12;
     rootdir.name_len = 1;
-    rootdir.inode = 2;
+    rootdir.inode = ino;
     rootdir.file_type = EXT2_FT_DIR;
     strcpy(rootdir.name, ".");
     memcpy(buffptr, &rootdir, 12);

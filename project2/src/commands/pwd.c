@@ -1,125 +1,83 @@
 #include "../../header/commands/pwd.h"
 
-int getParentInumber(int inumber)
+void printdirectory(int inumber, int parentinode)
 {
-    int result = 0;
+    int blk = (((parentinode)-1) / 8) + iblock;
+    int offset = ((parentinode)-1) % 8;
+    char sbuf[BLKSIZE] = {0};
+    char dbuf[BLKSIZE] = {0};
+    int iblocknumber = 0;
+    get_block(dev, blk, dbuf);
+    ip = (INODE *)dbuf + offset;
 
-    // find the .. directory
-    DIR parentDir;
-    result = getParentDir(inumber, &parentDir);
-
-    if (result == 1)
+    for (int x = 0; x < 12; x++)
     {
-        return 0;
-    }
-
-    // extract the inumber 
-    return parentDir.inode;
-}
-
-
-void getName(int parentInum, int inum, FileType fileType, char* nameResult)
-{
-    // find the directory with the correct inumber
-    int result = 1;
-    SearchValue value;
-    value.inumber = inum;
-    DIR dirResult;
-    result = getDir(parentInum, value, Search_INum, fileType, &dirResult);
-
-    // extract the name from directory structure
-    memcpy(nameResult, dirResult.name, dirResult.name_len);
-    nameResult[dirResult.name_len] = '\0';
-}
-
-void reverseString(char* string)
-{
-    int length = strlen(string);
-
-    char* left = string;
-    char* right = string + (length-1);
-
-    while (right > left)
-    {
-        char temp = *left;
-        *left = *right;
-        *right = temp;
-
-        right--;
-        left++;
-    }
-}
-
-int pwd(Command* command)
-{
-    char path[1024];
-    char* currentPath = path;
-    *currentPath = '/';
-    currentPath++;
-
-    int currentInumber = running->cwd->ino;
-    int parentInumber = 0;
-
-    // check for root
-    if (currentInumber == 2)
-    {
-        printf("/\n");
-        return 0;
-    }
-
-    char currentName[128];
-
-    // get parent
-    parentInumber = getParentInumber(currentInumber);
-
-    // find the name of the inode in parent dir
-    getName(parentInumber, currentInumber, type_Directory, currentName);
-
-    // add to path
-    strcpy(currentPath, currentName);
-    currentPath += strlen(currentName);
-    *currentPath = '/';
-    currentPath++;
-
-    // while parent != current
-    // actually check for root inside of the loop
-    while (parentInumber != currentInumber)
-    {
-        // set current to parent
-        currentInumber = parentInumber;
-
-        // get parent
-        parentInumber = getParentInumber(currentInumber);
-
-        // check for root
-        if (currentInumber == 2)
+        iblocknumber = ip->i_block[x];
+        if (iblocknumber == 0)
         {
             break;
         }
+        get_block(dev, iblocknumber, dbuf);
+        
 
-        // find the name of the inode in parent dir
-        getName(parentInumber, currentInumber, type_Directory, currentName);
+        char *cp = dbuf;
+        DIR *dp = (DIR *)dbuf;
 
-        // add to path
-        strcpy(currentPath, currentName);
-        currentPath += strlen(currentName);
-        *currentPath = '/';
-        currentPath++;
+        while (cp < &dbuf[BLKSIZE]) //while cp address is less than dbuff max address
+        {
+            if (dp->inode == inumber)
+            {
+                while (x < dp->name_len)
+                {
+                    sbuf[x] = dp->name[x];
+                    x++;
+                }
+                sbuf[x] = 0;
+                printf("%s", sbuf);
+            }
+            cp += dp->rec_len;
+            dp = (DIR *)cp;
+            if (cp >= &dbuf[BLKSIZE])
+            {
+                return 0;
+            }
+        }
     }
-
-    // cap the end of the string
-    *currentPath = '\0';
-
-    // reverse the path string
-    reverseString(path);
-
-    // print out the path string
-    printf("%s\n", path);
-
-    // return 0
-    return 0;
 }
 
+void pwdrecursive(int device, int inumber)
+{
+    char tempbuf[BLKSIZE] = {0};
+    if (inumber == 2)
+    {
+        return;
+    }
+    int iblocknumber = 0;
+    int offset = ((inumber)-1) % 8;
+    int blk = (((inumber)-1) / 8) + iblock;
+    
+    
+    get_block(dev, blk, tempbuf);
+    
+    ip = (INODE *)tempbuf + offset;
 
+    blk = ip->i_block[0];
 
+    iblocknumber = search_block(blk);
 
+    pwdrecursive(dev, iblocknumber); //change to look at current device for level 3
+    printf("/");
+    printdirectory(inumber, iblocknumber);
+}
+
+int pwd(Command *command)
+{
+    strcpy(kpath, "..");
+    kpathname[0] = "..";
+    kpathname[1] = 0;
+    int inumber = running->cwd->ino;
+    pwdrecursive(dev, running->cwd->ino);
+    printf("\n");
+
+    return 0;
+}
