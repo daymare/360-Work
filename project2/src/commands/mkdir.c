@@ -1,6 +1,6 @@
 #include "../../header/commands/mkdir.h"
 
-int mkDir(Command* command)
+int mkDir(Command *command)
 {
     MINODE *mip = NULL;
     MINODE *pip = NULL;
@@ -9,17 +9,17 @@ int mkDir(Command* command)
     char *child = NULL;
     char temp[64] = {0};
     checkforName = search(dev, 0);
-    if(checkforName != 0)
+    if (checkforName != 0)
     {
         printf("Dirname already exitst!\n");
         return 0;
     }
     kpathname[i] = kpath;
-    for(i = 0; kpathname[i] !='\0'; i++)
+    for (i = 0; kpathname[i] != '\0'; i++)
     {
         child = kpathname[i];
     }
-    if( i != 1)
+    if (i != 1)
     {
         kpathname[i - 1] = '\0';
     }
@@ -38,8 +38,9 @@ int mkDir(Command* command)
 
     pip->refCount++;
     pip->dirty++;
-    //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
-   iwrite(pip);
+    pip->INODE.i_atime = time(0L);
+    pip->INODE.i_mtime = time(0L);
+    iwrite(pip);
 }
 
 int mymkdir(MINODE *pip, char *name)
@@ -56,7 +57,7 @@ int mymkdir(MINODE *pip, char *name)
     //ip->i_gid = running->gid;                   // Group Id
     inodeptr->i_size = BLKSIZE;  // Size in bytes
     inodeptr->i_links_count = 2; // Links count=2 because of . and ..
-    ip->i_atime = time(0L);  // set to current time
+    ip->i_atime = time(0L);      // set to current time
     ip->i_ctime = time(0L);
     ip->i_mtime = time(0L);
     inodeptr->i_blocks = 2; // LINUX: Blocks count in 512-byte chunks
@@ -69,31 +70,31 @@ int mymkdir(MINODE *pip, char *name)
 
     mip->refCount++;
     mip->dirty = 1; // mark mINODE dirty
-    iwrite(mip);      // write INODE to disk
+    iwrite(mip);    // write INODE to disk
 
     DIR rootdir;
-    rootdir.rec_len = (__u16*)12;
-    rootdir.name_len = (__u8*)1;
-    rootdir.inode = (__u32*)ino;
+    rootdir.rec_len = (__u16 *)12;
+    rootdir.name_len = (__u8 *)1;
+    rootdir.inode = (__u32 *)ino;
     rootdir.file_type = EXT2_FT_DIR;
     rootdir.name[0] = '.';
     memcpy(dbuf, &rootdir, 9);
 
     DIR parentdir;
-    parentdir.rec_len = (__u16*)1012; 
-    parentdir.name_len = (__u8*)2;   
-    parentdir.inode = (__u32*)pip->ino;  
+    parentdir.rec_len = (__u16 *)1012;
+    parentdir.name_len = (__u8 *)2;
+    parentdir.inode = (__u32 *)pip->ino;
     parentdir.file_type = EXT2_FT_DIR;
     parentdir.name[0] = '.';
     parentdir.name[1] = '.';
-    memcpy(dbuf+12, &parentdir, 10);
+    memcpy(dbuf + 12, &parentdir, 10);
 
     put_block(dev, bno, dbuf);
 
-    addDIR(pip, ino, name, EXT2_FT_DIR );
+    addDIR(pip, ino, name, EXT2_FT_DIR);
 }
 
-int creat_file(Command* command)
+int creat_file(Command *command)
 {
     MINODE *mip = NULL;
     MINODE *pip = NULL;
@@ -101,11 +102,11 @@ int creat_file(Command* command)
     char *child = NULL;
     char temp[64] = {0};
 
-    for(i = 0; kpathname[i] !='\0'; i++)
+    for (i = 0; kpathname[i] != '\0'; i++)
     {
         child = kpathname[i];
     }
-    if( i != 1)
+    if (i != 1)
     {
         kpathname[i - 1] = '\0';
     }
@@ -127,6 +128,8 @@ int creat_file(Command* command)
 
     pip->refCount = 1;
     pip->dirty += 1;
+    pip->INODE.i_atime = time(0L);
+    pip->INODE.i_mtime = time(0L);
     iput(pip);
 }
 
@@ -139,11 +142,11 @@ int my_creat(MINODE *pip, char *name)
     mip = iget(dev, ino);
     ip = &mip->INODE;
     INODE *ip = &mip->INODE;
-    ip->i_mode = 0100644;    
+    ip->i_mode = 0100644;
     ip->i_uid = running->uid; // Owner uid
     //ip->i_gid = running->gid;                   // Group Id
-    ip->i_size = 0;  // Size in bytes
-    ip->i_links_count = 1; // Links count=2 because of . and ..
+    ip->i_size = 0;         // Size in bytes
+    ip->i_links_count = 1;  // Links count=2 because of . and ..
     ip->i_atime = time(0L); // set to current time
     ip->i_ctime = time(0L);
     ip->i_mtime = time(0L);
@@ -153,5 +156,5 @@ int my_creat(MINODE *pip, char *name)
     iput(mip);
     mip->dirty = 1; // mark mINODE dirty
     addDIR(pip, ino, name, EXT2_FT_REG_FILE);
-    iput(mip);      // write INODE to disk
+    iput(mip); // write INODE to disk
 }
