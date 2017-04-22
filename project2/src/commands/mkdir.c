@@ -56,7 +56,9 @@ int mymkdir(MINODE *pip, char *name)
     //ip->i_gid = running->gid;                   // Group Id
     inodeptr->i_size = BLKSIZE;  // Size in bytes
     inodeptr->i_links_count = 2; // Links count=2 because of . and ..
-    //ip->i_atime = i_ctime = i_mtime = time(0L); // set to current time
+    ip->i_atime = time(0L);  // set to current time
+    ip->i_ctime = time(0L);
+    ip->i_mtime = time(0L);
     inodeptr->i_blocks = 2; // LINUX: Blocks count in 512-byte chunks
     inodeptr->i_block[0] = bno;
     inodeptr->i_size_high = 0;
@@ -123,7 +125,7 @@ int creat_file(Command* command)
 
     my_creat(pip, child);
 
-    pip->refCount += 1;
+    pip->refCount = 1;
     pip->dirty += 1;
     //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
     iput(pip);

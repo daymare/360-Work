@@ -13,6 +13,7 @@
 #include "commands/link.h"
 #include "commands/open.h"
 #include "commands/close.h"
+#include "commands/rmdir.h"
 
 void runCommands(Pipe *commands);
 
