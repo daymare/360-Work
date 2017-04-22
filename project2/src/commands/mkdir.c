@@ -127,7 +127,6 @@ int creat_file(Command* command)
 
     pip->refCount = 1;
     pip->dirty += 1;
-    //pip->INODE.i_atime = i_ctime = i_mtime = time(0L);
     iput(pip);
 }
 
@@ -145,7 +144,9 @@ int my_creat(MINODE *pip, char *name)
     //ip->i_gid = running->gid;                   // Group Id
     ip->i_size = 0;  // Size in bytes
     ip->i_links_count = 1; // Links count=2 because of . and ..
-    //ip->i_atime = i_ctime = i_mtime = time(0L); // set to current time
+    ip->i_atime = time(0L); // set to current time
+    ip->i_ctime = time(0L);
+    ip->i_mtime = time(0L);
     ip->i_blocks = 0; // LINUX: Blocks count in 512-byte chunks
     ip->i_size_high = 0;
 
