@@ -14,7 +14,7 @@ int mkDir(Command *command)
     char *child = NULL;
     char temp[64] = {0};
     kpathname[i] = kpath;
-    checkforName = search(dev, 0);
+    checkforName = search(dev, running->cwd->ino);
     if (checkforName != 0)
     {
         printf("Dirname already exitst!\n");
