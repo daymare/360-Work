@@ -18,7 +18,6 @@ void printdirectory(int child, int parentinode)
             break;
         }
         get_block(dev, iblocknumber, dbuf);
-        
 
         char *cp = dbuf;
         DIR *dp = (DIR *)dbuf;
@@ -55,10 +54,9 @@ void pwdrecursive(int device, int inumber)
     int iblocknumber = 0;
     int offset = ((inumber)-1) % 8;
     int blk = (((inumber)-1) / 8) + iblock;
-    
-    
+
     get_block(dev, blk, tempbuf);
-    
+
     ip = (INODE *)tempbuf + offset;
 
     blk = ip->i_block[0];
@@ -72,10 +70,14 @@ void pwdrecursive(int device, int inumber)
 
 int pwd(Command *command)
 {
+    if (running->cwd->ino == 2)
+    {
+        printf("/\n");
+        return 0;
+    }
     strcpy(kpath, "..");
     kpathname[0] = "..";
     kpathname[1] = 0;
-    int inumber = running->cwd->ino;
     pwdrecursive(dev, running->cwd->ino);
     printf("\n");
 
