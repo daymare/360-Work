@@ -3,7 +3,7 @@
 #include "../../header/commands/close.h"
 
 
-int close(Command* command)
+int myClose(Command* command)
 {
     // get fd
     int fileDescriptor;

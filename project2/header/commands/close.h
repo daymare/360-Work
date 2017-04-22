@@ -6,6 +6,6 @@
 #include "../dataStructures.h"
 #include "../globals.h"
 
-int close(Command* command);
+int myClose(Command* command);
 
 #endif

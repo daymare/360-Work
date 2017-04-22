@@ -2,7 +2,7 @@
 
 char* commandNames[] = {"ls", "cd", "pwd", "unlink", "link", "mkdir", "touch", "open", "close", 0};
 
-int (*commandPointers[])(Command*) = {(int (*)()) ls, cd, pwd, unlink, link, mkDir, creat_file};
+int (*commandPointers[])(Command*) = {(int (*)()) ls, cd, pwd, unlink, link, mkDir, creat_file, myOpen, myClose};
 
 
 // returns the index in the commandPointers array of the given command
