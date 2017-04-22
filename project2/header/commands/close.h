@@ -1,8 +1,11 @@
 #ifndef CLOSE_H
 #define CLOSE_H
 
-#include "../dataStructures.h"
+#include <string.h>
 
-//int close(Command* command);
+#include "../dataStructures.h"
+#include "../globals.h"
+
+int close(Command* command);
 
 #endif

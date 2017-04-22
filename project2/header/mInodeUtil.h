@@ -10,6 +10,8 @@ int iput(MINODE* mip);
 
 int iwrite(MINODE* mip);
 
+// remove data blocks
+int truncate(MINODE* mip);
 
 
 #endif

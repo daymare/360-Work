@@ -100,7 +100,7 @@ int deallocateblock(int blk)
   // read block bitmap
   get_block(dev, bmap, block_buf);
 
-  clr_bit(block_buf, blk); //set that block to 1 to show that its being used
+  clr_bit(block_buf, blk); 
   put_block(dev, bmap, block_buf);
 }
 

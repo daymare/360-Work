@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <time.h>
 
 #include "dataStructures.h"
 #include "globals.h"
@@ -25,7 +26,7 @@ void loadBlocks(); // load important blocks
 
 //Kris Kris hes the best, if he cant do it...
 int balloc();
-int deallocateballoc(int blk);
+int deallocateblock(int blk);
 
 
 

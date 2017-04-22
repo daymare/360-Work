@@ -80,3 +80,73 @@ int iwrite(MINODE *mip)
         put_block(fd, blk, inodeBlock);
     }
 }
+
+// remove all data blocks from an minode
+int truncate(MINODE* mip)
+{
+    // deallocate inode data blocks
+    deallocateBlocks(&mip->INODE);
+
+    // update inodes time field
+    unsigned int now = (unsigned)time(NULL);
+    mip->INODE.i_mtime = now;
+
+    // set inode size to 0
+    mip->INODE.i_size = 0;
+
+    // mark mip dirty
+    mip->dirty = 1;
+}
+
+int deallocateBlocks(INODE* inode)
+{
+    for (int i = 0; i < 12; i++)
+    {
+        if (inode->i_block[i] == 0)
+            return 0;
+        
+        deallocateBlocksRecursive(inode->i_block[i], 0);
+        inode->i_block[i] = 0;
+    }
+
+    if (inode->i_block[12] == 0) return 0;
+    deallocateBlocksRecursive(inode->i_block[12], 1);
+    inode->i_block[12] = 0;
+    if (inode->i_block[13] == 0) return 0;
+    deallocateBlocksRecursive(inode->i_block[13], 2);
+    inode->i_block[13] = 0;
+    if (inode->i_block[14] == 0) return 0;
+    deallocateBlocksRecursive(inode->i_block[14], 3);
+    inode->i_block[14] = 0;
+
+}
+
+int deallocateBlocksRecursive(int blockNum, int numIndirections)
+{
+    // check if block number is invalid
+    if (blockNum == 0) return 0;
+
+    // no indirections
+    if (numIndirections == 0)
+    {
+        return deallocateblock(blockNum);
+    }
+
+    // one or more indirection
+    int i = 0;
+    char block[BLKSIZE];
+    get_block(fd, blockNum, block);
+    int* indirection = &block;
+
+    for (i = 0; i < 256; i++)
+    {
+        printIndirectDirectory(indirection[i], numIndirections-1);
+    }
+
+    deallocateblock(blockNum);
+}
+
+
+
+
+
