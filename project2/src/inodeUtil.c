@@ -314,7 +314,7 @@ int deialloc(int inode)
     // read INODE_bitmap block
     get_block(dev, imap, inode_buf);
 
-    clr_bit(inode_buf, inode);
+    clr_bit(inode_buf, (inode-1));
     incFreeInodes();
 
     put_block(dev, imap, inode_buf);

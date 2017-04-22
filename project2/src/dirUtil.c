@@ -7,9 +7,9 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
 
     char dbuf[BLKSIZE] = {0}; // buffer for directory
     char sbuf[BLKSIZE] = {0}; //buffer for string compare
-    
+
     char *current_block_position = NULL;
-    
+
     int ideal_len = 0, need_len = 0, remain_space = 0, blk = 0, block_number = 0, x = 0;
 
     int newdirnamelength = strlen(dirName);
@@ -25,7 +25,7 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
     dirptr = (DIR *)dbuf;
     current_block_position = dbuf;
 
-    while (current_block_position + dirptr->rec_len < dbuf + BLKSIZE) 
+    while (current_block_position + dirptr->rec_len < dbuf + BLKSIZE)
     {
         current_block_position += dirptr->rec_len;
         dirptr = (DIR *)current_block_position;
@@ -33,23 +33,23 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
 
     ideal_len = 4 * ((8 + dirptr->name_len + 3) / 4); //find the ideal length of the last dir entry
     remain_space = dirptr->rec_len - ideal_len;
-    
+
     need_len = 4 * ((8 + newdirnamelength + 3) / 4);
-    
+
     if (remain_space >= need_len) //enough space to add new dir to end of block
     {
         printf("ideal length:%d\n", ideal_len);
         printf("remaining space:%d\n", remain_space);
         printf("address to start write:%x\n", current_block_position);
-       
+
         dirptr->rec_len = ideal_len; //truncate last entry to make room for new entry
-       
-        current_block_position += dirptr->rec_len; 
-       
-        newdir.inode = (__u32*)ino;
+
+        current_block_position += dirptr->rec_len;
+
+        newdir.inode = (__u32 *)ino;
         newdir.file_type = filetype;
-        newdir.rec_len = (__u16*)remain_space;
-        newdir.name_len = (__u8*)newdirnamelength;
+        newdir.rec_len = (__u16 *)remain_space;
+        newdir.name_len = (__u8 *)newdirnamelength;
         memcpy(newdir.name, dirName, newdirnamelength);
 
         memcpy(current_block_position, &newdir, need_len);
@@ -69,12 +69,12 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
         current_block_position = dbuf;
         dirptr = (DIR *)dbuf;
 
-        newdir.inode = (__u32*)ino;
-        newdir.rec_len = (__u16*)BLKSIZE;
+        newdir.inode = (__u32 *)ino;
+        newdir.rec_len = (__u16 *)BLKSIZE;
         newdir.file_type = filetype;
-        newdir.name_len = (__u8*)strlen(dirName);
+        newdir.name_len = (__u8 *)strlen(dirName);
         need_len = 4 * ((8 + newdir.name_len + 3) / 4);
-       memcpy(newdir.name, dirName, newdirnamelength);
+        memcpy(newdir.name, dirName, newdirnamelength);
 
         *dirptr = newdir;
 
@@ -90,8 +90,8 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
 int findBlockWDir(int parentInum, SearchValue sv, SearchType st)
 {
     // get the parent inum
-    INODE parent;
-    getInode(parentInum, &parent);
+    MINODE *parent;
+    parent = iget(dev, parentInum);
 
     // find which block contains the dir
     int i = 0;
@@ -102,7 +102,7 @@ int findBlockWDir(int parentInum, SearchValue sv, SearchType st)
 
     for (i = 0; i < 12; i++)
     {
-        currentBlock = parent.i_block[i];
+        currentBlock = parent->INODE.i_block[i];
         if (currentBlock == 0)
         {
             return 0;
@@ -116,13 +116,13 @@ int findBlockWDir(int parentInum, SearchValue sv, SearchType st)
         }
     }
 
-    result = findBlockWDirInIndirectBlock(parent.i_block[12], sv, st, 1);
+    result = findBlockWDirInIndirectBlock(parent->INODE.i_block[12], sv, st, 1);
     if (result != 0)
         return result;
-    result = findBlockWDirInIndirectBlock(parent.i_block[13], sv, st, 2);
+    result = findBlockWDirInIndirectBlock(parent->INODE.i_block[13], sv, st, 2);
     if (result != 0)
         return result;
-    result = findBlockWDirInIndirectBlock(parent.i_block[14], sv, st, 3);
+    result = findBlockWDirInIndirectBlock(parent->INODE.i_block[14], sv, st, 3);
     if (result != 0)
         return result;
 
@@ -228,18 +228,19 @@ int removeDIR(int parent, SearchValue sv, SearchType st)
     int result = 0;
 
     // find the block with the DIR we need to remove
-    int resultBlock = findBlockWDir(parent, sv, st);
+    int resultBlock = 0;
+    resultBlock = findBlockWDir(parent, sv, st);
 
     if (resultBlock == 0)
         return 0;
 
     // get the block
-    char block[BLKSIZE];
-    get_block(fd, resultBlock, block);
+    char blockbuf[BLKSIZE] = {0};
+    get_block(fd, resultBlock, blockbuf);
 
     // find the dir structure
     DIR *previousDir = NULL;
-    DIR *deletingDir = getDirPointer(block, sv, st, &previousDir);
+    DIR *deletingDir = getDirPointer(blockbuf, sv, st, &previousDir);
 
     // delete the dir structure
     char *currentDir = (char *)deletingDir;
@@ -254,32 +255,37 @@ int removeDIR(int parent, SearchValue sv, SearchType st)
     }
 
     // check if the dir we deleted was the last dir
-    if (nextDir >= block + BLKSIZE)
+    if (nextDir >= blockbuf + BLKSIZE)
     {
         // update the previous dir
-        previousDir->rec_len = (int)(block + BLKSIZE - (char *)previousDir);
-        put_block(fd, resultBlock, block);
+        previousDir->rec_len = (int)(blockbuf + BLKSIZE - (char *)previousDir);
+        put_block(fd, resultBlock, blockbuf);
         return 0;
     }
 
+    __u16 recLen = 0;
+    __u16 ideal_len = 0;
     // shuffle up the remaining dirs
-    while (nextDir < block + BLKSIZE)
+    while (nextDir < blockbuf + BLKSIZE)
     {
         // copy down
         DIR *nextDIR = (DIR *)nextDir;
-        int recLen = nextDIR->rec_len;
+        DIR *currentDIR = (DIR *)currentDir;
+        recLen = nextDIR->rec_len;
+        ideal_len = 4 * ((8 + nextDIR->name_len + 3) / 4);
+
         memmove(currentDir, nextDir, recLen);
 
         // update next pointer
         nextDir += recLen;
         currentDir += recLen;
     }
-
+    currentDir -= recLen;
     // currentDirectory should be pointing at the last directory in the block
     DIR *currentDIR = (DIR *)currentDir;
-    currentDIR->rec_len = (int)(block + BLKSIZE - currentDir);
+    currentDIR->rec_len = (int)(blockbuf + BLKSIZE - currentDir);
 
     // put the block back into it's place
-    put_block(fd, resultBlock, block);
+    put_block(fd, resultBlock, blockbuf);
     return 0;
 }

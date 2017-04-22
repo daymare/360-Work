@@ -1,15 +1,15 @@
 
 #include "../../header/commands/cd.h"
 
-int cd(Command* command)
+int cd(Command *command)
 {
     // assume command is valid
     // TODO have parser take care of this.
 
-    MINODE* minode;
+    MINODE *minode;
 
     // path empty? go to root.
-    char* pathString = command->tokenizedCommand[1];
+    char *pathString = command->tokenizedCommand[1];
     if (strcmp(pathString, "") == 0)
     {
         minode = iget(dev, 2);
@@ -24,17 +24,13 @@ int cd(Command* command)
     // find inode
     int inodeIndex = findInodeIndex(&path, type_Directory);
     minode = iget(dev, inodeIndex);
-    if(&(minode->INODE) == 0)
+    if (inodeIndex == 0)
     {
-        printf("iget failed to return correct address!\n");
-        exit(1);
+        printf("Directory not found!\n");
+        return 0;
     }
+    minode = iget(dev, inodeIndex);
     running->cwd = minode;
 
     return 0;
 }
-
-
-
-
-

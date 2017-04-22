@@ -9,7 +9,7 @@ MINODE *iget(int dev, int ino)
     for (i = 0; i < NMINODE; i++)
     {
         mip = &minode[i];
-        if (mip->dev == dev && mip->ino == ino)
+        if (mip->refCount != 0 && mip->dev == dev && mip->ino == ino)
         {
             mip->refCount++;
             printf("found [%d %d] as minode[%d] in core\n", dev, ino, i);

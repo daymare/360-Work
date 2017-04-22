@@ -35,14 +35,17 @@ mkdir fup8
 mkdir fup9
 ls
 rmdir fup1
+ls
 rmdir fup2
 rmdir fup3
+ls
 rmdir fup4
 rmdir fup5
 rmdir fup6
 rmdir fup7
 rmdir fup8
 rmdir fup9
+ls
 pwd
 cd ..
 pwd 
