@@ -8,13 +8,13 @@ int mkDir(Command *command)
     int pino = 0, i = 0;
     char *child = NULL;
     char temp[64] = {0};
+    kpathname[i] = kpath;
     checkforName = search(dev, 0);
     if (checkforName != 0)
     {
         printf("Dirname already exitst!\n");
         return 0;
     }
-    kpathname[i] = kpath;
     for (i = 0; kpathname[i] != '\0'; i++)
     {
         child = kpathname[i];

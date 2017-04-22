@@ -209,13 +209,14 @@ void kpathnamehelper(char const *input)
 {
     char *dummypath[10];
     char temp[64];
+    char *temp2;
     strcpy(temp, input);
     tokenize_cmd(temp, dummypath);
     strcpy(cmd, dummypath[0]);
 
     if (strcmp(cmd, "q") == 0 || strcmp(cmd, "quit") == 0 || strcmp(cmd, "exit") == 0)
     {
-      /*  MINODE *ptr;
+        /*  MINODE *ptr;
         for (int i = 0; minode[i].ino != 0; i++)
         {
             ptr = &(minode[i]);
@@ -228,5 +229,7 @@ void kpathnamehelper(char const *input)
     {
         strcpy(kpath, dummypath[1]);
         tokenize_path(dummypath[1]);
+        return;
     }
+
 }
