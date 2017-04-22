@@ -87,7 +87,6 @@ int search_block(int searchblk)
                 }
                 else
                 {
-                    printf("ERROR: File is not a directoy\n");
                     return dp->inode;
                 }
             }

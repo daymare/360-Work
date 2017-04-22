@@ -2,7 +2,7 @@
 
 int mkDir(Command *command)
 {
-        if(command->tokenizedCommand[1][0] == 0)
+    if (command->tokenizedCommand[1][0] == 0)
     {
         printf("Error no Directory name specified!\n");
         return;
@@ -73,7 +73,6 @@ int mymkdir(MINODE *pip, char *name)
         inodeptr->i_block[i] = 0;
     }
 
-    mip->refCount++;
     mip->dirty = 1; // mark mINODE dirty
     iwrite(mip);    // write INODE to disk
 
@@ -101,11 +100,25 @@ int mymkdir(MINODE *pip, char *name)
 
 int creat_file(Command *command)
 {
+    if (command->tokenizedCommand[1][0] == 0)
+    {
+        printf("Error no Directory name specified!\n");
+        return;
+    }
+    int checkforName = 1;
+    checkforName = search(dev, running->cwd->ino);
+    if (checkforName != 0)
+    {
+        printf("Filename already exitst!\n");
+        return 0;
+    }
+
     MINODE *mip = NULL;
     MINODE *pip = NULL;
     int pino = 0, i = 0;
     char *child = NULL;
     char temp[64] = {0};
+    kpathname[i] = kpath;
 
     for (i = 0; kpathname[i] != '\0'; i++)
     {
@@ -117,25 +130,22 @@ int creat_file(Command *command)
     }
     if (kpath[0] == '/')
     {
-        mip = root;
+        pip = root;
         dev = root->dev;
-        pino = search(dev, 0);
     }
     else
     {
-        mip = running->cwd;
+        pip = running->cwd;
         dev = running->cwd->dev;
-        pino = running->cwd->ino;
     }
-    pip = iget(dev, pino);
 
     my_creat(pip, child);
 
     pip->refCount = 1;
-    pip->dirty += 1;
+    pip->dirty = 1;
     pip->INODE.i_atime = time(0L);
     pip->INODE.i_mtime = time(0L);
-    iput(pip);
+    iwrite(pip);
 }
 
 int my_creat(MINODE *pip, char *name)
@@ -158,7 +168,6 @@ int my_creat(MINODE *pip, char *name)
     ip->i_blocks = 0; // LINUX: Blocks count in 512-byte chunks
     ip->i_size_high = 0;
 
-    iput(mip);
     mip->dirty = 1; // mark mINODE dirty
     addDIR(pip, ino, name, EXT2_FT_REG_FILE);
     iput(mip); // write INODE to disk
