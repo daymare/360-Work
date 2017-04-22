@@ -2,6 +2,11 @@
 
 int rmdir(Command *command)
 {
+    if(command->tokenizedCommand[1][0] == 0)
+    {
+        printf("Error no Directory name specified!\n");
+        return;
+    }
     char *name = NULL;
     Path filePath;
     INODE *result;
