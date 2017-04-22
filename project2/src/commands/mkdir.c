@@ -2,6 +2,11 @@
 
 int mkDir(Command *command)
 {
+        if(command->tokenizedCommand[1][0] == 0)
+    {
+        printf("Error no Directory name specified!\n");
+        return;
+    }
     MINODE *mip = NULL;
     MINODE *pip = NULL;
     int checkforName = 1;
