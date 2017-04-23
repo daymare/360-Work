@@ -15,6 +15,7 @@
 #include "commands/close.h"
 #include "commands/rmdir.h"
 #include "commands/pfd.h"
+#include "commands/lseek.h"
 
 void runCommands(Pipe *commands);
 
