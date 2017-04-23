@@ -35,6 +35,12 @@ int init(void)
 
     // set running
     running = &proc[0];
+
+    for (int i = 0; i < NFD; i++)
+    {
+        proc[0].fd[i] = NULL;
+        proc[1].fd[i] = NULL;
+    }
 }
 
 int main(int argc, char **argv, char **env)

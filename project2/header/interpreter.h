@@ -14,6 +14,7 @@
 #include "commands/open.h"
 #include "commands/close.h"
 #include "commands/rmdir.h"
+#include "commands/pfd.h"
 
 void runCommands(Pipe *commands);
 
