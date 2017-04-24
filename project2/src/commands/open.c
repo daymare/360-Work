@@ -2,7 +2,6 @@
 #include "../../header/commands/open.h"
 
 
-
 int myOpen(Command* command)
 {
     // find path inumber
@@ -15,8 +14,30 @@ int myOpen(Command* command)
     // get open mode
     int openMode = atoi(command->tokenizedCommand[2]);
 
+    // check running for OFT with write access
+    if (openMode != 0) // anything other than read is exclusive
+    {
+        // search for other files with the same inode
+        for (int i = 0; i < NFD; i++)
+        {
+            OFT* oft = running->fd[i];
+
+            if (oft == NULL)
+            {
+                break;
+            }
+
+            if (oft->mptr->ino = inum && oft->mode != 0)
+            {
+                printf("Already exists and OFT with write access!\n");
+                return 1;
+            }
+        }
+    }
+
     // get minode for inumber
     MINODE* minode = iget(inum);
+
 
     // allocate new OFT
     OFT* newOFT = (OFT*)malloc(sizeof(OFT));
@@ -48,14 +69,14 @@ int myOpen(Command* command)
     int i = 0;
     for (i = 0; i < NFD; i++)
     {
-        if (running->fd[i] != NULL)
+        if (running->fd[i] == NULL)
         {
             running->fd[i] = newOFT;
             break;
         }
     }
 
-    if (i = NFD)
+    if (i == NFD)
     {
         printf("no free file descriptors in running proc!\n");
         return -1;
