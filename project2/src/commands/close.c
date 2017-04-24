@@ -22,8 +22,8 @@ int myClose(Command* command)
     }
 
     // close the file
-    OFT* oftp = running->fd[fd];
-    running->fd[fd] = 0;
+    OFT* oftp = running->fd[fileDescriptor];
+    running->fd[fileDescriptor] = NULL;
     oftp->refCount = 0;
     if (oftp->refCount > 0) return 1;
 
