@@ -18,6 +18,7 @@
 #include "commands/lseek.h"
 #include "commands/simlink.h"
 #include "commands/write.h"
+#include "commands/read.h"
 
 void runCommands(Pipe *commands);
 

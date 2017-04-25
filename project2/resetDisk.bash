@@ -1,4 +1,4 @@
 #!/bin/bash
 
 rm mydisk
-cp diskimage mydisk
+cp diskBackup mydisk
