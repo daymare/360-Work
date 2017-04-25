@@ -7,8 +7,16 @@ int write_file(Command* command)
     //grab the fd 
     int writefd = atoi(command->tokenizedCommand[1]);
 
+    //check file mode
+    if(running->fd[writefd]->mode == 0)
+    {
+        printf("Error file in read only mode!\n");
+        return 0;
+    }
+
     // grab the string to write
-    char* userstring = command->tokenizedCommand[2];
+    printf("Enter line to be written to file:");
+    char* userstring = get_user_input();
 
     //check that fd is open in WR, RW, or APPEND mode
 
