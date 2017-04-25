@@ -16,6 +16,7 @@
 #include "commands/rmdir.h"
 #include "commands/pfd.h"
 #include "commands/lseek.h"
+#include "commands/simlink.h"
 
 void runCommands(Pipe *commands);
 

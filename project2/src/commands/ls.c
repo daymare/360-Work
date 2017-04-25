@@ -79,12 +79,13 @@ int printDirectory(int blockNum)
         }*/
 
         // print out the entry
-        printf("%s\n", name);
+        printf("%s", name);
+        check_Dir_forSim_PRINTLINK(currentDir);
         numChars += currentDir->name_len;
 
         if (numChars > 50)
         {
-            printf("\n");
+          //  printf("\n");
             numChars = 0;
         }
 

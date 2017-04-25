@@ -12,7 +12,7 @@ MINODE *iget(int dev, int ino)
         if (mip->refCount != 0 && mip->dev == dev && mip->ino == ino)
         {
             mip->refCount++;
-            printf("found [%d %d] as minode[%d] in core\n", dev, ino, i);
+            //printf("found [%d %d] as minode[%d] in core\n", dev, ino, i);
             return mip;
         }
     }
@@ -21,7 +21,7 @@ MINODE *iget(int dev, int ino)
         mip = &minode[i];
         if (mip->refCount == 0)
         {
-            printf("allocating NEW minode[%d] for [%d %d]\n", i, dev, ino);
+            //printf("allocating NEW minode[%d] for [%d %d]\n", i, dev, ino);
             mip->refCount = 1;
             mip->dev = dev;
             mip->ino = ino; // assing to (dev, ino)
