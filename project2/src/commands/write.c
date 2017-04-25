@@ -36,7 +36,6 @@ int write_file(Command* command)
 int mywrite(int fd, char writebuf[], int bytes)
 {
     int diskBlock = 0;
-    int startByte = 0;
     int writtenbytes = 0;
     MINODE *mip = NULL;
     mip = running->fd[fd]->mptr;
@@ -44,7 +43,7 @@ int mywrite(int fd, char writebuf[], int bytes)
     while (bytes > 0)
     {
         int logicalBlock = running->fd[fd]->offset / BLKSIZE;
-        int startbyte = running->fd[fd]->offset % BLKSIZE;
+        int startByte = running->fd[fd]->offset % BLKSIZE;
 
         if (logicalBlock < 12)
         {

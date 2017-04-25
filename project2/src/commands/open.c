@@ -20,6 +20,10 @@ int myOpen(Command* command)
         // search for other files with the same inode
         for (int i = 0; i < NFD; i++)
         {
+            if(running->fd[i] == NULL)
+            {
+                break;
+            }
             OFT* oft = running->fd[i];
 
             if (oft->mptr->ino = inum && oft->mode != 0)
@@ -31,7 +35,7 @@ int myOpen(Command* command)
     }
 
     // get minode for inumber
-    MINODE* minode = iget(inum);
+    MINODE* minode = iget(dev, inum);
 
 
     // allocate new OFT
@@ -55,6 +59,7 @@ int myOpen(Command* command)
             break;
         case 3: // append
             newOFT->offset = minode->INODE.i_size;
+            break;
         default: // invalid mode
             printf("invalid mode!\n");
             return -1;
