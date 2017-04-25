@@ -1,5 +1,5 @@
-#ifndef OPEN_H
-#define OPEN_H
+#ifndef WRITE_H
+#define WRITE_H
 
 #include <stdio.h>
 #include <string.h>
@@ -9,9 +9,10 @@
 #include "../globals.h"
 #include "../inodeUtil.h"
 #include "../blockUtil.h"
+#include "write.h"
+#include "open.h"
 
-int myOpen(Command* command);
-int openhelper(int inum, int openMode);
 
+int mycp(Command* command);
 
 #endif

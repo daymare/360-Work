@@ -14,7 +14,14 @@ int myOpen(Command* command)
     // get open mode
     int openMode = atoi(command->tokenizedCommand[2]);
 
-    // check running for OFT with write access
+return openhelper(inum, openMode);
+
+}
+
+
+int openhelper(int inum, int openMode)
+{
+        // check running for OFT with write access
     if (openMode != 0) // anything other than read is exclusive
     {
         // search for other files with the same inode
