@@ -6,7 +6,7 @@ void parseFilepath(char *filepath, Path *result)
 {
     char *s = NULL;
     char currentPath[128];
-    memset(result, 0, sizeof(Path));
+   memset(result, 0, sizeof(Path));
     result->pathType = EmptyPath;
 
     // case for empty filepath
@@ -102,13 +102,23 @@ void getRootInode(INODE *result)
 int findFileInode(INODE *parent, char *filename, FileType type, INODE *result)
 {
     // get first block in parent
-    int currentBlock = parent->i_block[0];
+    INODE *temp;
+    if(parent->i_mode == 0xA000)
+    {
+       temp = readSimLink(parent);
+    }
+    else
+    {
+        temp = parent;
+    }
+
+    int currentBlock = temp->i_block[0];
     int index = 0;
     int i = 0;
 
     for (i = 0; i < 12; i++)
     {
-        currentBlock = parent->i_block[i];
+        currentBlock = temp->i_block[i];
         if (currentBlock == 0)
         {
             printf("file not found!\n");
@@ -120,7 +130,7 @@ int findFileInode(INODE *parent, char *filename, FileType type, INODE *result)
         index = findInodeInBlock(buf, filename, type, result);
 
         if (index != 0)
-        {
+        {   
             return index;
         }
     }
@@ -138,6 +148,7 @@ int findInodeIndexInBlock(char *blockBuf, char *filename, FileType type)
     char *cp = blockBuf;
     DIR *dp = (DIR *)blockBuf;
     char name[128];
+    int inum = 0;
 
     while (cp < &blockBuf[BLKSIZE])
     {
@@ -146,10 +157,15 @@ int findInodeIndexInBlock(char *blockBuf, char *filename, FileType type)
 
         if (strcmp(filename, name) == 0)
         {
+            if(dp->file_type == 7)
+            {
+                inum = simlinkfromino(dp->inode);
+                return inum;
+            }
             if (dp->file_type == (int)type)
             {
                 // get the INODE of this file
-                int inum = dp->inode;
+                inum = dp->inode;
                 return inum;
             }
             else

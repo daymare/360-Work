@@ -217,8 +217,8 @@ int findDir(Path *path, FileType fileType, DIR *result)
         exit(0);
     char block[BLKSIZE];
     get_block(fd, callResult, block);
-    DIR **dummy;
-    *result = *getDirPointer(block, sv, Search_Name, dummy);
+    DIR *dummy;
+    *result = *getDirPointer(block, sv, Search_Name, &dummy);
 }
 
 // remove the specified dir from its parent directory
