@@ -17,6 +17,7 @@
 #include "commands/pfd.h"
 #include "commands/lseek.h"
 #include "commands/simlink.h"
+#include "commands/write.h"
 
 void runCommands(Pipe *commands);
 
