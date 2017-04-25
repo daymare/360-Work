@@ -22,11 +22,6 @@ int myOpen(Command* command)
         {
             OFT* oft = running->fd[i];
 
-            if (oft == NULL)
-            {
-                break;
-            }
-
             if (oft->mptr->ino = inum && oft->mode != 0)
             {
                 printf("Already exists and OFT with write access!\n");
