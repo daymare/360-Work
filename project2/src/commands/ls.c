@@ -1,6 +1,8 @@
 
 #include "../../header/commands/ls.h"
 
+int lsmode = 0; // 0 for normal, 1 for -l mode.
+
 
 int printMinodeDirectory(MINODE* directory)
 {
@@ -42,7 +44,7 @@ int printIndirectDirectory(int blockNum, int numIndirections)
     }
 }
 
-    // print out all the names with fancy colors
+// print out all the names in a block
 int printDirectory(int blockNum)
 {
     // get the block
@@ -55,7 +57,6 @@ int printDirectory(int blockNum)
 
     char name[128];
     char color[5];
-    int numChars = 0;
 
     while (currentPlace < block + BLKSIZE)
     {
@@ -63,31 +64,19 @@ int printDirectory(int blockNum)
         memcpy(name, currentDir->name, currentDir->name_len);
         name[currentDir->name_len] = '\0';
 
-        // pick fancy color based on file type
-        /*switch(currentDir->file_type)
-        {
-            case 1: // regular file. Boring.
-                strcpy(color, ANSI_COLOR_RESET);
-                break;
-            case 2: // directory. Blue
-                strcpy(color, ANSI_COLOR_CYAN);
-                break;
-            // TODO add different color for other filetypes
-            defualt:
-                strcpy(color, ANSI_COLOR_RESET);
-                break;
-        }*/
-
         // print out the entry
-        printf("%s", name);
-        check_Dir_forSim_PRINTLINK(currentDir);
-        numChars += currentDir->name_len;
-
-        if (numChars > 50)
+        if (lsmode == 0)
         {
-          //  printf("\n");
-            numChars = 0;
+            // normal print mode
+            printf("%s", name);
+            check_Dir_forSim_PRINTLINK(currentDir);
         }
+        else
+        {
+            // long print mode
+            printDIR_Long(currentDir, name);
+        }
+
 
         // increment our place
         currentPlace += currentDir->rec_len;
@@ -95,12 +84,81 @@ int printDirectory(int blockNum)
     }
 }
 
+void printDIR_Long(DIR* dir, char* name)
+{
+    // get minode
+    MINODE* minode = iget(fd, dir->inode);
+
+    // get inode
+    INODE* inode = &minode->INODE;
+
+
+    // get permissions and filetype
+    char permissionStr[17] = "----------------";
+    char fullPermissionStr[17] = "xwrcwrcwr-------";
+
+    int16_t mode = inode->i_mode;
+
+    // get file accessibility
+    int j = 0;
+    for (int i = 8; i >= 0; i--)
+    {
+        if (mode & (1 << i))
+        {
+            permissionStr[j] = fullPermissionStr[j];
+        }
+        j++;
+    }
+
+    // get filetype
+    if((mode & 0xF000) == 0x8000)
+        permissionStr[0] = '-';
+    if((mode & 0xF000) == 0x4000)
+        permissionStr[0] = 'd';
+    if((mode & 0xF000) == 0xA000)
+        permissionStr[0] = 'l';
+
+    // get uid
+    int uid = inode->i_uid;
+
+    // get group id
+    int gid = inode->i_gid;
+
+    // get size
+    int size = inode->i_size;
+
+    // get modified time
+    time_t modifiedTime = inode->i_mtime;
+
+    // get time string
+    char formattedTime[128];
+    strcpy(formattedTime, ctime(&modifiedTime));
+    formattedTime[strlen(formattedTime)-1] = '\0';
+
+    // print everything out.
+    printf("%s %d %d %7d %s %s", permissionStr, uid, gid, size, formattedTime, name);
+
+    // check for simlink
+    check_Dir_forSim_PRINTLINK(dir);
+
+    iput(minode);
+}
+
 int ls(Command* command)
 {
     MINODE* node;
+    int pathLoc = 1;
+    lsmode = 0;
+
+    // is -l flag present?
+    if (command->tokenizedCommand[1][0] == '-')
+    {
+        lsmode = 1;
+        pathLoc = 2;
+    }
 
     // is path empty? if so print out the current directory
-    char* pathString = command->tokenizedCommand[1];
+    char* pathString = command->tokenizedCommand[pathLoc];
     if (strcmp(pathString, "") == 0)
     {
         // print current working directory of the running process
@@ -121,7 +179,7 @@ int ls(Command* command)
     printMinodeDirectory(minode);
 
     // release minode
-
+    iput(minode);
 }
 
 
