@@ -58,6 +58,7 @@ int mkDir(Command *command)
     mymkdir(pip, newDir);
 
     pip->refCount++;
+    pip->INODE.i_links_count++;
     pip->dirty = 1;
     pip->INODE.i_atime = time(0L);
     pip->INODE.i_mtime = time(0L);

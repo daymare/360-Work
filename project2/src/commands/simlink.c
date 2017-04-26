@@ -16,11 +16,11 @@ int simlink(Command *command)
         printf("Pathname not found, link aborted!\n");
     }
 
-    // go to parent of link file
+    // go to destination
     Path linkPath;
     INODE dummy;
     parseFilepath(linkPathString, &linkPath);
-    int parentIno = findInodeIndex(&linkPath, type_Directory);
+    int parentIno = getParentInode(&linkPath, &dummy);
     MINODE *pminode = iget(dev, parentIno);
 
     MINODE *mip = NULL;
@@ -102,8 +102,9 @@ int simlinkfromino(int inumber)
     char linkBuffer[BLKSIZE] = {0};
     memcpy(&linkBuffer, &(linkMinode->INODE.i_block[0]), 64);
 
-    tokenize_path(&linkBuffer);
-    int inum = search(dev, 0);
+    Path path;
+    parseFilepath(linkBuffer, &path);
+    int inum = findInodeIndex(&path, type_Any);
 
     return inum;
 }
