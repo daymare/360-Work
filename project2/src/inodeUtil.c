@@ -76,12 +76,12 @@ void putInode(int index, INODE *inode)
 {
     // get block
     int iblock = (index - 1) / 8;
-    int istart = gp->bg_inode_table;
+    int istart = start_iblock;
     get_block(fd, istart + iblock, buf);
 
     // put inode in place
     int inum = (index - 1) % 8;
-    memcpy((INODE *)fd + inum, inode, sizeof(INODE));
+    memcpy((INODE *)buf + inum, inode, sizeof(INODE));
 
     put_block(fd, iblock, buf);
 }
@@ -162,7 +162,7 @@ int findInodeIndexInBlock(char *blockBuf, char *filename, FileType type)
                 inum = simlinkfromino(dp->inode);
                 return inum;
             }
-            if (dp->file_type == (int)type)
+            if (type == type_Any || dp->file_type == (int)type)
             {
                 // get the INODE of this file
                 inum = dp->inode;

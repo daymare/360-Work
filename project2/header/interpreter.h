@@ -22,6 +22,7 @@
 #include "commands/cat.h"
 #include "commands/cp.h"
 #include "commands/mv.h"
+#include "commands/chmod.h"
 
 void runCommands(Pipe *commands);
 
