@@ -21,6 +21,7 @@
 #include "commands/read.h"
 #include "commands/cat.h"
 #include "commands/cp.h"
+#include "commands/mv.h"
 
 void runCommands(Pipe *commands);
 

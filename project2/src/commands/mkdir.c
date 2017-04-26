@@ -5,33 +5,48 @@ int mkDir(Command *command)
     if (command->tokenizedCommand[1][0] == 0)
     {
         printf("Error no Directory name specified!\n");
-        return;
+        return 0;
     }
     MINODE *mip = NULL;
     MINODE *pip = NULL;
     int checkforName = 1;
     int pino = 0, i = 0;
-    char *child = NULL;
-    char temp[64] = {0};
-    kpathname[i] = kpath;
-    checkforName = search(dev, running->cwd->ino);
+
+    Path filePath;
+    char *filePathString = command->tokenizedCommand[1];
+    parseFilepath(filePathString, &filePath);
+
+    char newDir[64] = {0};
+    strcpy(newDir, filePath.baseName);
+    checkforName = findInodeIndex(&filePath, type_Directory);
     if (checkforName != 0)
     {
         printf("Dirname already exitst!\n");
         return 0;
     }
-    for (i = 0; kpathname[i] != '\0'; i++)
+
+    if (filePath.pathType == AbsolutePath)
     {
-        child = kpathname[i];
-    }
-    if (i != 1)
-    {
-        kpathname[i - 1] = '\0';
-    }
-    if (kpath[0] == '/')
-    {
-        pip = root;
-        dev = root->dev;
+        if (filePath.tokenizedPath[0][0] == 0)
+        {
+            pip = iget(dev, 2);
+            dev = root->dev;
+        }
+        else
+        {
+            int i = 0;
+            while (filePath.tokenizedPath[i][0] != 0 && i < 10)
+            {
+                i++;
+            }
+            i--;
+            strcpy(filePath.baseName, filePath.tokenizedPath[i]);
+            filePath.tokenizedPath[i][0] = 0;
+            int inum = findInodeIndex(&filePath, type_Directory);
+            pip = iget(dev, inum);
+            dev = root->dev;
+            i = 0;
+        }
     }
     else
     {
@@ -39,7 +54,7 @@ int mkDir(Command *command)
         dev = running->cwd->dev;
     }
 
-    mymkdir(pip, child);
+    mymkdir(pip, newDir);
 
     pip->refCount++;
     pip->dirty++;
@@ -60,9 +75,9 @@ int mymkdir(MINODE *pip, char *name)
     inodeptr->i_mode = 040755;      // OR 040755: DIR type and permissions
     inodeptr->i_uid = running->uid; // Owner uid
     //ip->i_gid = running->gid;                   // Group Id
-    inodeptr->i_size = BLKSIZE;  // Size in bytes
-    inodeptr->i_links_count = 2; // Links count=2 because of . and ..
-    inodeptr->i_atime = time(0L);      // set to current time
+    inodeptr->i_size = BLKSIZE;   // Size in bytes
+    inodeptr->i_links_count = 2;  // Links count=2 because of . and ..
+    inodeptr->i_atime = time(0L); // set to current time
     inodeptr->i_ctime = time(0L);
     inodeptr->i_mtime = time(0L);
     inodeptr->i_blocks = 2; // LINUX: Blocks count in 512-byte chunks
@@ -103,7 +118,7 @@ int creat_file(Command *command)
     if (command->tokenizedCommand[1][0] == 0)
     {
         printf("Error no Directory name specified!\n");
-        return;
+        return 0;
     }
     int checkforName = 1;
     checkforName = search(dev, running->cwd->ino);
@@ -118,7 +133,7 @@ int creat_file(Command *command)
     int pino = 0, i = 0;
     char *child = NULL;
     char temp[64] = {0};
-    kpathname[i] = kpath;
+    *kpathname[i] = kpath;
 
     for (i = 0; kpathname[i] != '\0'; i++)
     {
@@ -126,7 +141,7 @@ int creat_file(Command *command)
     }
     if (i != 1)
     {
-        kpathname[i - 1] = '\0';
+        *kpathname[i - 1] = '\0';
     }
     if (kpath[0] == '/')
     {
