@@ -5,7 +5,13 @@
 int get_block(int fd, int blk, char buf[ ])
 {
   lseek(fd, (long)blk*BLKSIZE, SEEK_SET);
-  read(fd, buf, BLKSIZE);
+  int size = read(fd, buf, BLKSIZE);
+
+  if (size == 0) 
+  {
+    printf("could not read block!");
+    return 0;
+  }
 }
 int put_block(int fd, int blk, char buf[ ])
 {
