@@ -81,9 +81,10 @@ int addDIR(MINODE *pip, int ino, char *dirName, int filetype)
         put_block(dev, newblock, dbuf);
 
         pip->INODE.i_size += 1024;
+        iwrite(pip);
         return 1;
     }
-
+    iwrite(pip);
     return 0;
 }
 

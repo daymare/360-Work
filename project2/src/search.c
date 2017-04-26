@@ -9,12 +9,12 @@ int search(int *dev, int searchnode)
     int *indirect;
     if (searchnode != 0)
     {
-        block_number = (((searchnode)-1) / 8) + iblock;
+        block_number = (((searchnode)-1) / 8) + start_iblock;
         offset = ((searchnode)-1) % 8;
     }
     else
     {
-        block_number = iblock;
+        block_number = start_iblock;
         offset = 1;
     }
     get_block(dev, block_number, buf);

@@ -89,8 +89,8 @@ void loadBlocks()
     imap = gp->bg_inode_bitmap;
     printf("imap at block: %d\n", imap);
 
-    iblock = gp->bg_inode_table;
-    printf("inode table begins at block: %d\n", iblock);
+    start_iblock = gp->bg_inode_table;
+    printf("inode table begins at block: %d\n", start_iblock);
 }
 
 int deallocateblock(int blk)

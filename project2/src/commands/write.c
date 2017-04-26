@@ -37,6 +37,7 @@ int mywrite(int fd, char writebuf[], int bytes)
     MINODE *mip = NULL;
     mip = running->fd[fd]->mptr;
     OFT *oftp = running->fd[fd];
+    char setblocktozero[BLKSIZE] = {0};
 
     while (bytes > 0)
     {
@@ -48,7 +49,6 @@ int mywrite(int fd, char writebuf[], int bytes)
             if (mip->INODE.i_block[logicalBlock] == 0) //changed from ip-> to mip->
             {
                 mip->INODE.i_block[logicalBlock] = balloc();
-                char setblocktozero[BLKSIZE] = {0};
                 get_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
                 memset(setblocktozero, 0, BLKSIZE);
                 put_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
@@ -57,16 +57,29 @@ int mywrite(int fd, char writebuf[], int bytes)
         }
         else if (logicalBlock >= 12 && logicalBlock < (256 + 12))
         {
+            if (mip->INODE.i_block[12] == 0)
+            {
+                mip->INODE.i_block[12] = balloc();
+                get_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
+                memset(setblocktozero, 0, BLKSIZE);
+            }
+
             char indirectbuf[BLKSIZE] = {0};
-            get_block(mip->dev, logicalBlock, indirectbuf);
+            get_block(mip->dev, 12, indirectbuf);
             int *indirect = (int *)indirectbuf;
             diskBlock = write_indirect(indirect, mip);
-            put_block(mip->dev, logicalBlock, indirectbuf);
+            put_block(mip->dev, 12, indirectbuf);
         }
         else
         {
+            if (mip->INODE.i_block[13] == 0)
+            {
+                mip->INODE.i_block[13] = balloc();
+                get_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
+                memset(setblocktozero, 0, BLKSIZE);
+            }
             char doubleindirectbuf[BLKSIZE] = {0};
-            get_block(mip->dev, logicalBlock, doubleindirectbuf);
+            get_block(mip->dev, 13, doubleindirectbuf);
             int *indirect = (int *)doubleindirectbuf;
             diskBlock = write_double_indirect(indirect, mip);
             put_block(mip->dev, logicalBlock, doubleindirectbuf);
@@ -122,7 +135,6 @@ int write_indirect(int *iblock_array, MINODE *mip)
             printf("Indirect block number:%d\n", iblock_array[i]);
             return iblock_array[i];
         }
-
     }
     return diskblock;
 }

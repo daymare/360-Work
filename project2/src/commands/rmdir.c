@@ -30,7 +30,7 @@ int rmdir(Command *command)
     removeDIR(parentIno, sv, Search_Name);
 
     // get INODE of ino into dbuf[ ]
-    int blk = (parent->ino - 1) / 8 + iblock; // iblock = Inodes start block #
+    int blk = (parent->ino - 1) / 8 + start_iblock; // iblock = Inodes start block #
     int disp = (parent->ino - 1) % 8;
     //printf("iget: ino=%d blk=%d disp=%d\n", ino, blk, disp);
     char parent_buff[BLKSIZE] = {0};
@@ -48,7 +48,7 @@ int rmdir(Command *command)
     }
     
     iput(child);
-    int child_block_number = (((childIno)-1) / 8) + iblock;
+    int child_block_number = (((childIno)-1) / 8) + start_iblock;
 
     deialloc(child_block_number);
 }

@@ -2,7 +2,7 @@
 
 void printdirectory(int child, int parentinode)
 {
-    int blk = (((parentinode)-1) / 8) + iblock;
+    int blk = (((parentinode)-1) / 8) + start_iblock;
     int offset = ((parentinode)-1) % 8;
     char sbuf[BLKSIZE] = {0};
     char dbuf[BLKSIZE] = {0};
@@ -53,7 +53,7 @@ void pwdrecursive(int device, int inumber)
     }
     int iblocknumber = 0;
     int offset = ((inumber)-1) % 8;
-    int blk = (((inumber)-1) / 8) + iblock;
+    int blk = (((inumber)-1) / 8) + start_iblock;
 
     get_block(dev, blk, tempbuf);
 

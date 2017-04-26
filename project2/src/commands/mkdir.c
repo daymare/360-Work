@@ -7,7 +7,6 @@ int mkDir(Command *command)
         printf("Error no Directory name specified!\n");
         return 0;
     }
-    MINODE *mip = NULL;
     MINODE *pip = NULL;
     int checkforName = 1;
     int pino = 0, i = 0;
@@ -34,15 +33,17 @@ int mkDir(Command *command)
         }
         else
         {
-            int i = 0;
-            while (filePath.tokenizedPath[i][0] != 0 && i < 10)
-            {
-                i++;
-            }
-            i--;
+           /* //int i = 0;
+            //while (filePath.tokenizedPath[i][0] != 0 && i < 10)
+            //{
+            //    i++;
+            //}
+            //i--;
             strcpy(filePath.baseName, filePath.tokenizedPath[i]);
             filePath.tokenizedPath[i][0] = 0;
-            int inum = findInodeIndex(&filePath, type_Directory);
+            int inum = findInodeIndex(&filePath, type_Directory); */
+            INODE dummy;
+            int inum = getParentInode(&filePath, &dummy);
             pip = iget(dev, inum);
             dev = root->dev;
             i = 0;
@@ -57,7 +58,7 @@ int mkDir(Command *command)
     mymkdir(pip, newDir);
 
     pip->refCount++;
-    pip->dirty++;
+    pip->dirty = 1;
     pip->INODE.i_atime = time(0L);
     pip->INODE.i_mtime = time(0L);
     iwrite(pip);

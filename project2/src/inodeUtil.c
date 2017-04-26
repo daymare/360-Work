@@ -64,7 +64,7 @@ void getInode(int index, INODE *result)
 {
     // get block
     int iblock = (index - 1) / 8;
-    int istart = gp->bg_inode_table;
+    int istart = start_iblock;
     get_block(fd, istart + iblock, buf);
 
     // get INODE
@@ -232,7 +232,7 @@ int findInodeAbsPath(Path *filepath, INODE *result, FileType endType)
 
     // search for the desired inode
     INODE root;
-    getRootInode(&root);
+    getRootInode(&root); //this sometimes does not grab the root inode!
 
     return findInodePath(&root, filepath, result, endType);
 }
@@ -359,7 +359,7 @@ void truncatePath(Path *path)
     // i is now the last index in tokenizedPath
 
     // move i index to baseName
-    strcpy(path->tokenizedPath[i], path->baseName);
+    strcpy(path->baseName, path->tokenizedPath[i]);
     strcpy(path->tokenizedPath[i], "");
 }
 

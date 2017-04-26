@@ -34,7 +34,7 @@ int fd;
 int dev;
 
 // file system constants
-int nblocks, ninoes, bmap, imap, iblock;
+int nblocks, ninoes, bmap, imap, start_iblock;
 int ninodes, nfreeInodes, nfreeBlocks;
 
 char* disk;

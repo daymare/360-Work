@@ -23,5 +23,6 @@ while( n = readFile(fd, &mybuf[0], 1024)){
    } 
 
    strcpy(command->tokenizedCommand[0], "close");
+   printf("\n");
    runCommands(command);
 }
