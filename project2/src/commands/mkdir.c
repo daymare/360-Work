@@ -132,21 +132,42 @@ int creat_file(Command *command)
     MINODE *pip = NULL;
     int pino = 0, i = 0;
     char *child = NULL;
-    char temp[64] = {0};
-    *kpathname[i] = kpath;
 
-    for (i = 0; kpathname[i] != '\0'; i++)
+    Path filePath;
+    char *filePathString = command->tokenizedCommand[1];
+    parseFilepath(filePathString, &filePath);
+
+    char newDir[64] = {0};
+    strcpy(newDir, filePath.baseName);
+    checkforName = findInodeIndex(&filePath, type_File);
+    if (checkforName != 0)
     {
-        child = kpathname[i];
+        printf("Dirname already exitst!\n");
+        return 0;
     }
-    if (i != 1)
+
+    if (filePath.pathType == AbsolutePath)
     {
-        *kpathname[i - 1] = '\0';
-    }
-    if (kpath[0] == '/')
-    {
-        pip = root;
-        dev = root->dev;
+        if (filePath.tokenizedPath[0][0] == 0)
+        {
+            pip = iget(dev, 2);
+            dev = root->dev;
+        }
+        else
+        {
+            int i = 0;
+            while (filePath.tokenizedPath[i][0] != 0 && i < 10)
+            {
+                i++;
+            }
+            i--;
+            strcpy(filePath.baseName, filePath.tokenizedPath[i]);
+            filePath.tokenizedPath[i][0] = 0;
+            int inum = findInodeIndex(&filePath, type_Directory);
+            pip = iget(dev, inum);
+            dev = root->dev;
+            i = 0;
+        }
     }
     else
     {
@@ -154,7 +175,8 @@ int creat_file(Command *command)
         dev = running->cwd->dev;
     }
 
-    my_creat(pip, child);
+
+    my_creat(pip, newDir);
 
     pip->refCount = 1;
     pip->dirty = 1;

@@ -1,6 +1,6 @@
 #include "../header/interpreter.h"
 
-char* commandNames[] = {"ls", "cd", "pwd", "unlink", "link", "mkdir", "rmdir", "touch", "open", "close", "pfd", "lseek", "simlink", "write", "read", "cat", "cp", "mv", 0};
+char* commandNames[] = {"ls", "cd", "pwd", "unlink", "link", "mkdir", "rmdir", "touch", "open", "close", "pfd", "lseek", "symlink", "write", "read", "cat", "cp", "mv", 0};
 
 int (*commandPointers[])(Command*) = {(int (*)()) ls, cd, pwd, unlink, link, mkDir, rmdir, creat_file, myOpen, myClose, pfd, myLseek, simlink, write_file, myRead, mycat, mycp , mymv};
 
