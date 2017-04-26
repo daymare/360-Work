@@ -25,6 +25,12 @@ int rmdir(Command *command)
     parent = iget(dev, parentIno);
     child->refCount = 1;
 
+    if(child->INODE.i_links_count > 2)
+    {
+        printf("Cannot delete dir not empty!\n");
+        return;
+    }
+
 
     sv.name = filePath.baseName;
     removeDIR(parentIno, sv, Search_Name);
