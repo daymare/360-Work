@@ -60,12 +60,13 @@ int mywrite(int fd, char writebuf[], int bytes)
             if (mip->INODE.i_block[12] == 0)
             {
                 mip->INODE.i_block[12] = balloc();
-                get_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
+                get_block(mip->dev, mip->INODE.i_block[12], setblocktozero);
                 memset(setblocktozero, 0, BLKSIZE);
+                put_block(mip->dev, mip->INODE.i_block[12], setblocktozero);
             }
 
             char indirectbuf[BLKSIZE] = {0};
-            get_block(mip->dev, 12, indirectbuf);
+            get_block(mip->dev, mip->INODE.i_block[12], indirectbuf);
             int *indirect = (int *)indirectbuf;
             diskBlock = write_indirect(indirect, mip);
             put_block(mip->dev, 12, indirectbuf);
@@ -75,11 +76,11 @@ int mywrite(int fd, char writebuf[], int bytes)
             if (mip->INODE.i_block[13] == 0)
             {
                 mip->INODE.i_block[13] = balloc();
-                get_block(mip->dev, mip->INODE.i_block[logicalBlock], setblocktozero);
+                get_block(mip->dev, mip->INODE.i_block[13], setblocktozero);
                 memset(setblocktozero, 0, BLKSIZE);
             }
             char doubleindirectbuf[BLKSIZE] = {0};
-            get_block(mip->dev, 13, doubleindirectbuf);
+            get_block(mip->dev, mip->INODE.i_block[13], doubleindirectbuf);
             int *indirect = (int *)doubleindirectbuf;
             diskBlock = write_double_indirect(indirect, mip);
             put_block(mip->dev, logicalBlock, doubleindirectbuf);
