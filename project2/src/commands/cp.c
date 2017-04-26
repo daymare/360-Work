@@ -23,7 +23,8 @@ int mycp(Command *command)
     int n = 0;
     char readbuf[BLKSIZE] = {0};
 
-  //  while(n =read(fd, readbuf, BLKSIZE) ){
- //      write(gd, readbuf, n);  // notice the n in write()
+    while(n =readFile(fd, &readbuf, BLKSIZE) ){
+       mywrite(gd, readbuf, n);  // notice the n in write()
+    }
    
 }

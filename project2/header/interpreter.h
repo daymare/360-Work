@@ -20,6 +20,7 @@
 #include "commands/write.h"
 #include "commands/read.h"
 #include "commands/cat.h"
+#include "commands/cp.h"
 
 void runCommands(Pipe *commands);
 

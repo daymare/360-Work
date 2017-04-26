@@ -28,7 +28,7 @@ int readFile(int fileDescriptor, char* buffer, int nbytes)
     int offset = oftp->offset;
     int fileSize = oftp->mptr->INODE.i_size;
     int available = fileSize - offset;
-    int bytesRead;
+    int bytesRead = 0;
 
     char* cq = buffer;
 

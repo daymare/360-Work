@@ -1,5 +1,5 @@
-#ifndef WRITE_H
-#define WRITE_H
+#ifndef CP_H
+#define CP_H
 
 #include <stdio.h>
 #include <string.h>
