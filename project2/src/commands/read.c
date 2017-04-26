@@ -70,7 +70,6 @@ int readFileLogical(int logicalBlock, int fileDescriptor, char* buffer, int star
     logicalBlock -= 256;
     if (logicalBlock < 256 * 256)
     {
-        return readBlockIndirect(2, logicalBlock, startByte, nbytes, avail);
         return readBlockIndirect(2, inode->i_block[13], buffer, logicalBlock, startByte, nbytes, avail);
     }
 
