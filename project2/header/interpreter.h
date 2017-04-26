@@ -19,6 +19,7 @@
 #include "commands/simlink.h"
 #include "commands/write.h"
 #include "commands/read.h"
+#include "commands/cat.h"
 
 void runCommands(Pipe *commands);
 
