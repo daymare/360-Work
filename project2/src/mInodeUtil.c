@@ -27,7 +27,7 @@ MINODE *iget(int dev, int ino)
             mip->ino = ino; // assing to (dev, ino)
             mip->dirty = mip->mounted = mip->mptr = 0;
             // get INODE of ino into dbuf[ ]
-            blk = (ino - 1) / 8 + iblock; // iblock = Inodes start block #
+            blk = (ino - 1) / 8 + start_iblock; // iblock = Inodes start block #
             disp = (ino - 1) % 8;
             //printf("iget: ino=%d blk=%d disp=%d\n", ino, blk, disp);
             get_block(dev, blk, dbuf);
@@ -68,7 +68,7 @@ int iwrite(MINODE *mip)
         // find block number
         int blockNum = mip->ino;
 
-        blk = (((blockNum)-1) / 8) + iblock;
+        blk = (((blockNum)-1) / 8) + start_iblock;
         offset = ((blockNum)-1) % 8;
 
         char inodeBlock[BLKSIZE];

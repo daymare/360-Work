@@ -20,7 +20,7 @@ int simlink(Command *command)
     Path linkPath;
     INODE dummy;
     parseFilepath(linkPathString, &linkPath);
-    int parentIno = getParentInode(&linkPath, &dummy);
+    int parentIno = findInodeIndex(&linkPath, type_Directory);
     MINODE *pminode = iget(dev, parentIno);
 
     MINODE *mip = NULL;
