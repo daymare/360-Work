@@ -1,57 +1,19 @@
-ls
-mkdir fuck1
-mkdir fuck2
-mkdir fuck3
-mkdir fuck4
-mkdir fuck5
-mkdir fuck6
-mkdir fuck7
-mkdir fuck8
-mkdir fuck9
-mkdir fuck10
-ls
-cd fuck1
-mkdir kik1
-mkdir kik2
-mkdir kik3
-mkdir kik4
-mkdir kik5
-mkdir kik6
-mkdir kik7
-mkdir kik8
-mkdir kik9
-mkdir kik10
-ls
-cd kik9
-mkdir fup1
-mkdir fup2
-mkdir fup3
-mkdir fup4
-mkdir fup5
-mkdir fup6
-mkdir fup6
-mkdir fup7
-mkdir fup8
-mkdir fup9
-ls
-rmdir fup1
-ls
-rmdir fup2
-rmdir fup3
-ls
-rmdir fup4
-rmdir fup5
-rmdir fup6
-rmdir fup7
-rmdir fup8
-rmdir fup9
-ls
+cd /
 pwd
-cd ..
-pwd 
-cd .
+ls
+mkdir /a 
+ls
+cd /a/b
+mkdir new
+mkdir /a/b/again
+cd /a/b pwd
+cd ../../
 pwd
-cd ..
-pwd
+touch f1 
+ls
+touch /a/f2
+ls /a
+touch /a/f2 
+ls /a/f2
 q
 

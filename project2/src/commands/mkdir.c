@@ -121,18 +121,12 @@ int creat_file(Command *command)
         printf("Error no Directory name specified!\n");
         return 0;
     }
-    int checkforName = 1;
-    checkforName = search(dev, running->cwd->ino);
-    if (checkforName != 0)
-    {
-        printf("Filename already exitst!\n");
-        return 0;
-    }
 
     MINODE *mip = NULL;
     MINODE *pip = NULL;
     int pino = 0, i = 0;
     char *child = NULL;
+    int checkforName = 1;
 
     Path filePath;
     char *filePathString = command->tokenizedCommand[1];
@@ -143,7 +137,9 @@ int creat_file(Command *command)
     checkforName = findInodeIndex(&filePath, type_File);
     if (checkforName != 0)
     {
-        printf("Dirname already exitst!\n");
+        printf("Filename already exitst!\n");
+        MINODE *fileptr = iget(dev, checkforName);
+        fileptr->INODE.i_mtime = time(0L);
         return 0;
     }
 
