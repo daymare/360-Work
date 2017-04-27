@@ -105,7 +105,7 @@ int simlinkfromino(int inumber)
 
     Path path;
     parseFilepath(linkBuffer, &path);
-    int inum = findInodeIndex(&path, 2);
+    int inum = findInodeIndex(&path, type_Any);
 
     return inum;
 }
