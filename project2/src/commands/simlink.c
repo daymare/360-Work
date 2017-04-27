@@ -46,6 +46,7 @@ int simlink(Command *command)
     char path_buffer[BLKSIZE] = {0};
     strcpy(path_buffer, filePathString);
     int stlength = strlen(path_buffer) + 1;
+    path_buffer[stlength] = 0;
     memcpy(&(inodeptr->i_block[0]), &path_buffer, stlength);
 
     //int parentIno = getParentInode(&linkPath, &dummy);
@@ -100,11 +101,11 @@ int simlinkfromino(int inumber)
 
     linkMinode = iget(dev, inumber);
     char linkBuffer[BLKSIZE] = {0};
-    memcpy(&linkBuffer, &(linkMinode->INODE.i_block[0]), 64);
+    memcpy(&linkBuffer, &(linkMinode->INODE.i_block[0]), 32);
 
     Path path;
     parseFilepath(linkBuffer, &path);
-    int inum = findInodeIndex(&path, type_Any);
+    int inum = findInodeIndex(&path, 2);
 
     return inum;
 }
